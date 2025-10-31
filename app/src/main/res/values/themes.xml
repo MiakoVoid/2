@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.GreenFinance" parent="Theme.Material3.DayNight.NoActionBar">
@@ -10,7 +11,7 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/secondary_color</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="colorSecondaryContainer">@color/background_color</item>
+        <item name="colorSecondaryContainer">@color/surface_color</item>
         <item name="colorOnSecondaryContainer">@color/text_primary</item>
 
         <!-- Tertiary brand color. -->
@@ -22,7 +23,7 @@
         <!-- Error color. -->
         <item name="colorError">@color/error_color</item>
         <item name="colorOnError">@color/white</item>
-        <item name="colorErrorContainer">@color/background_color</item>
+        <item name="colorErrorContainer">@color/surface_color</item>
         <item name="colorOnErrorContainer">@color/text_primary</item>
 
         <!-- Status bar color. -->
@@ -34,7 +35,7 @@
         <!-- Surface and background colors. -->
         <item name="colorSurface">@color/surface_color</item>
         <item name="colorOnSurface">@color/text_primary</item>
-        <item name="colorSurfaceVariant">@color/background_color</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
         <item name="android:colorBackground">@color/background_color</item>
         <item name="colorOnBackground">@color/text_primary</item>
@@ -50,5 +51,11 @@
         <!-- Dialog theme. -->
         <item name="alertDialogTheme">@style/ThemeOverlay.Material3.Dialog.Alert</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Material3.MaterialAlertDialog</item>
+
+        <!-- Additional Material 3 attributes for better consistency -->
+        <item name="colorPrimaryInverse">@color/primary_color</item>
+        <item name="colorSurfaceInverse">@color/surface_color</item>
+        <item name="colorOnSurfaceInverse">@color/text_primary</item>
+        <item name="colorOutlineVariant">@color/border_color</item>
     </style>
 </resources>

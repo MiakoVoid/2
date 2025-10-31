@@ -1,23 +1,42 @@
 package com.example.greenfinance.presentation.home.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import androidx.lifecycle.ViewModelProvider;
+
 import com.example.greenfinance.R;
 import com.example.greenfinance.common.base.BaseActivity;
+import com.example.greenfinance.common.util.SecurePreferences;
 import com.example.greenfinance.databinding.ActivityMainBinding;
+import com.example.greenfinance.data.model.Bill;
+import com.example.greenfinance.presentation.auth.view.LoginActivity;
+import com.example.greenfinance.presentation.home.adapter.BillAdapter;
 import com.example.greenfinance.presentation.home.viewmodel.HomeViewModel;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
     private HomeViewModel viewModel;
+    private BillAdapter billAdapter;
     private boolean isBatchMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 检查用户是否已登录，如果未登录则跳转到登录页面
+        if (!isUserLoggedIn()) {
+            redirectToLogin();
+            return;
+        }
 
         // 使用DataBinding加载布局
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -30,6 +49,23 @@ public class MainActivity extends BaseActivity {
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel); // 启用ViewModel数据绑定
 
+        // 初始化账单适配器
+        initBillAdapter();
+
+    }
+
+    private boolean isUserLoggedIn() {
+        // 初始化安全存储
+        SecurePreferences.init(this);
+        
+        // 检查是否有保存的token且未过期
+        return SecurePreferences.getToken() != null && !SecurePreferences.isTokenExpired();
+    }
+
+    private void redirectToLogin() {
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -56,9 +92,39 @@ public class MainActivity extends BaseActivity {
         // 通过DataBinding访问视图组件
     }
 
+    private void initBillAdapter() {
+        billAdapter = new BillAdapter();
+        binding.rvRecentBills.setAdapter(billAdapter);
+        
+        // 添加示例数据
+        List<Bill> sampleBills = createSampleBills();
+        billAdapter.setBills(sampleBills);
+    }
+
+    private List<Bill> createSampleBills() {
+        List<Bill> bills = new ArrayList<>();
+        
+        // 创建示例账单数据
+        Date now = new Date();
+        bills.add(new Bill(1, new BigDecimal("25.50"), "餐饮", "麦当劳", now));
+        bills.add(new Bill(2, new BigDecimal("18.00"), "交通", "地铁", now));
+        
+        // 添加昨天的账单
+        Date yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        bills.add(new Bill(3, new BigDecimal("89.90"), "购物", "超市购物", yesterday));
+        bills.add(new Bill(4, new BigDecimal("12.00"), "餐饮", "便利店", yesterday));
+        
+        // 添加前天的账单
+        Date twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+        bills.add(new Bill(5, new BigDecimal("35.50"), "餐饮", "肯德基", twoDaysAgo));
+        
+        return bills;
+    }
+
 
     private void setupClickListeners() {
-        binding.tvManageBudget.setOnClickListener(v -> {
+        // 使用正确的ID引用管理预算按钮
+        binding.btnManageBudget.setOnClickListener(v -> {
             // TODO: 跳转到预算管理页面
         });
     }

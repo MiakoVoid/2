@@ -9,18 +9,24 @@
             type="com.example.greenfinance.presentation.home.viewmodel.HomeViewModel" />
     </data>
 
-    <!-- 最外层使用浅灰色背景 -->
+    <!-- 外层容器：用品牌浅绿灰背景，与白色卡片形成柔和对比 -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_light">
+        android:background="@color/background_color">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            app:elevation="4dp">
+            android:background="@color/surface_color"
+            app:elevation="0dp">
+
+            <!-- 顶部分隔线：与边框色一致，弱化标题栏与内容区的割裂感 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/border_color" />
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
@@ -29,32 +35,35 @@
                 app:menu="@menu/home_menu"
                 app:title="绿芽记账"
                 app:titleTextColor="@color/text_primary"
-                app:titleCentered="true" />
+                app:titleCentered="true"
+                app:navigationIconTint="@color/text_primary" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
+        <!-- 滚动内容区：保持填充，避免内容拉伸异常 -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:fillViewport="true">
 
-            <!-- 内容区域容器保持浅灰色背景 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- 财务概览卡片 - 白色背景 -->
+                <!-- 财务概览卡片：用surface_color（白色），阴影+边框强化层级 -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/financial_overview_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="@color/white"
+                    app:cardBackgroundColor="@color/surface_color"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="3dp"
-                    app:cardMaxElevation="6dp">
+                    app:strokeColor="@color/border_color"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -62,15 +71,18 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
+                        <!-- 卡片标题：加品牌绿左间距，强化视觉引导 -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="16dp"
+                            android:paddingStart="4dp"
                             android:text="财务概览"
                             android:textColor="@color/text_primary"
-                            android:textSize="16sp"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
 
+                        <!-- 收支数据区：用surface_secondary（浅绿白）背景，与卡片白色区分 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -78,18 +90,16 @@
                             android:baselineAligned="false"
                             android:orientation="horizontal">
 
-                            <!-- 今日支出 - 白色背景 -->
+                            <!-- 今日支出：浅绿白背景+绿灰边框，数据更突出 -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="4dp"
                                 android:layout_weight="1"
-                                android:background="@color/white"
+                                android:background="@drawable/bg_card_inner"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="12dp"
-                                android:roundedCorners="12dp"
-                                android:elevation="1dp">
+                                android:padding="16dp">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -102,26 +112,23 @@
                                     android:id="@+id/tv_today_expense"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@{viewModel.todayExpense}"
                                     android:textColor="@color/expense_color"
-                                    android:textSize="18sp"
+                                    android:textSize="22sp"
                                     android:textStyle="bold" />
-
                             </LinearLayout>
 
-                            <!-- 本月支出 - 白色背景 -->
+                            <!-- 本月支出：与今日支出样式统一 -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="4dp"
                                 android:layout_weight="1"
-                                android:background="@color/white"
+                                android:background="@drawable/bg_card_inner"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="12dp"
-                                android:roundedCorners="12dp"
-                                android:elevation="1dp">
+                                android:padding="16dp">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -134,26 +141,23 @@
                                     android:id="@+id/tv_month_expense"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@{viewModel.monthExpense}"
                                     android:textColor="@color/expense_color"
-                                    android:textSize="18sp"
+                                    android:textSize="22sp"
                                     android:textStyle="bold" />
-
                             </LinearLayout>
 
-                            <!-- 本月收入 - 白色背景 -->
+                            <!-- 本月收入：用income_color（深绿），与支出形成明确对比 -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginHorizontal="4dp"
                                 android:layout_weight="1"
-                                android:background="@color/white"
+                                android:background="@drawable/bg_card_inner"
                                 android:gravity="center"
                                 android:orientation="vertical"
-                                android:padding="12dp"
-                                android:roundedCorners="12dp"
-                                android:elevation="1dp">
+                                android:padding="16dp">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -166,36 +170,28 @@
                                     android:id="@+id/tv_month_income"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
+                                    android:layout_marginTop="8dp"
                                     android:text="@{viewModel.monthIncome}"
                                     android:textColor="@color/income_color"
-                                    android:textSize="18sp"
+                                    android:textSize="22sp"
                                     android:textStyle="bold" />
-
                             </LinearLayout>
 
                         </LinearLayout>
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginVertical="12dp"
-                            android:background="@color/gray_divider" />
-
-                        <!-- 预算区域 - 白色背景 -->
+                        <!-- 预算区域：用surface_secondary（浅绿白）背景，与卡片白色区分 -->
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/white"
+                            android:layout_width="355dp"
+                            android:layout_height="106dp"
+                            android:background="@drawable/bg_card_inner"
                             android:orientation="vertical"
-                            android:padding="12dp"
-                            android:roundedCorners="12dp"
-                            android:elevation="1dp">
+                            android:padding="16dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
+                                android:layout_marginBottom="12dp"
+                                android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -204,8 +200,9 @@
                                     android:layout_weight="1"
                                     android:text="剩余预算"
                                     android:textColor="@color/text_primary"
-                                    android:textSize="14sp" />
+                                    android:textSize="16sp" />
 
+                                <!-- 剩余预算金额：用success_color（浅绿），符合"充足"的语义 -->
                                 <TextView
                                     android:id="@+id/tv_remaining_budget"
                                     android:layout_width="wrap_content"
@@ -213,23 +210,25 @@
                                     android:layout_marginEnd="12dp"
                                     android:text="@{viewModel.remainingBudget}"
                                     android:textColor="@color/success_color"
-                                    android:textSize="16sp"
+                                    android:textSize="18sp"
                                     android:textStyle="bold" />
 
-                                <TextView
-                                    android:id="@+id/tv_manage_budget"
+                                <!-- 管理按钮：hover/pressed状态用品牌绿，反馈更清晰 -->
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btn_manage_budget"
+                                    style="@style/Widget.Material3.Button.TextButton"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:background="?attr/selectableItemBackgroundBorderless"
-                                    android:clickable="true"
-                                    android:focusable="true"
-                                    android:padding="4dp"
+                                    android:minWidth="0dp"
+                                    android:minHeight="0dp"
+                                    android:padding="8dp"
                                     android:text="管理"
                                     android:textColor="@color/link_color"
                                     android:textSize="14sp" />
 
                             </LinearLayout>
 
+                            <!-- 预算进度条：轨道用border_color（绿灰），指示器按状态匹配语义色 -->
                             <com.google.android.material.progressindicator.LinearProgressIndicator
                                 android:id="@+id/budget_progress"
                                 android:layout_width="match_parent"
@@ -237,18 +236,19 @@
                                 android:layout_marginTop="4dp"
                                 android:progress="@{viewModel.budgetProgress}"
                                 app:indicatorColor="@{viewModel.budgetProgressColor}"
-                                app:trackColor="@color/gray_light"
-                                app:trackCornerRadius="4dp"
-                                app:trackThickness="8dp" />
+                                app:trackColor="@color/border_color"
+                                app:trackCornerRadius="6dp"
+                                app:trackThickness="10dp" />
 
+                            <!-- 预算使用率：右对齐，用text_secondary（绿灰），不抢焦点 -->
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="end"
-                                android:layout_marginTop="4dp"
+                                android:layout_marginTop="8dp"
                                 android:text="@{viewModel.budgetUsageText}"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
+                                android:textSize="14sp" />
 
                         </LinearLayout>
 
@@ -256,59 +256,38 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal"
-                    android:padding="4dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="最近账单"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="auto"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="4dp"
-                        android:text="查看全部"
-                        android:textColor="@color/link_color"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <!-- 账单列表卡片 - 白色背景 -->
+                <!-- 最近账单卡片：与财务概览卡片样式统一，保持视觉一致性 -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="80dp"
-                    app:cardBackgroundColor="@color/white"
+                    android:layout_marginBottom="88dp"
+                    app:cardBackgroundColor="@color/surface_color"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="3dp">
+                    app:cardElevation="3dp"
+                    app:strokeColor="@color/border_color"
+                    app:strokeWidth="1dp">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_recent_bills"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
-                        android:paddingTop="8dp"
-                        tools:itemCount="3"
-                        tools:listitem="@layout/item_bill" />
+                        android:orientation="vertical">
+
+                        <!-- 账单列表：加底部间距，避免最后一项贴边 -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_recent_bills"
+                            android:layout_width="match_parent"
+                            android:layout_height="450dp"
+                            android:nestedScrollingEnabled="false"
+                            android:paddingHorizontal="2dp"
+                            android:paddingBottom="20dp"
+                            tools:itemCount="5"
+                            tools:listitem="@layout/item_bill" />
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
-
         <include
             android:id="@+id/bottom_navigation"
             layout="@layout/component_bottom_navigation" />

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.greenfinance.R;
+
 public class HomeViewModel extends ViewModel {
     
     private MutableLiveData<String> todayExpense = new MutableLiveData<>();
@@ -11,6 +13,8 @@ public class HomeViewModel extends ViewModel {
     private MutableLiveData<String> monthIncome = new MutableLiveData<>();
     private MutableLiveData<String> remainingBudget = new MutableLiveData<>();
     private MutableLiveData<Integer> budgetProgress = new MutableLiveData<>();
+    private MutableLiveData<Integer> budgetProgressColor = new MutableLiveData<>();
+    private MutableLiveData<String> budgetUsageText = new MutableLiveData<>();
     
     public HomeViewModel() {
         // 初始化数据
@@ -25,6 +29,8 @@ public class HomeViewModel extends ViewModel {
         monthIncome.setValue("¥8,500.00");
         remainingBudget.setValue("¥2,143.80");
         budgetProgress.setValue(57); // 57%进度
+        budgetProgressColor.setValue(R.color.budget_sufficient);
+        budgetUsageText.setValue("已使用 57% 预算");
     }
     
     public LiveData<String> getTodayExpense() { return todayExpense; }
@@ -32,6 +38,8 @@ public class HomeViewModel extends ViewModel {
     public LiveData<String> getMonthIncome() { return monthIncome; }
     public LiveData<String> getRemainingBudget() { return remainingBudget; }
     public LiveData<Integer> getBudgetProgress() { return budgetProgress; }
+    public int getBudgetProgressColor() { return budgetProgressColor.getValue(); }
+    public LiveData<String> getBudgetUsageText() { return budgetUsageText; }
     
     // TODO: 添加业务逻辑方法
 }
