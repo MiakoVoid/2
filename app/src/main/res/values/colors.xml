@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌核心色 -->
+    <color name="primary_color">#5A826D</color>
+    <color name="secondary_color">#8CAE9B</color>
+    <color name="accent_color">#3A5C4A</color>
+    <color name="brand_auxiliary">#7D9E87</color>
+
+    <!-- 语义功能色 -->
+    <color name="income_color">#4A8C6D</color>
+    <color name="expense_color">#C8A89A</color>
+    <color name="success_color">#6BA582</color>
+    <color name="warning_color">#E6B98A</color>
+    <color name="error_color">#E6A2A2</color>
+    <color name="info_color">#7AA6C5</color>
+
+    <!-- 中性色系 -->
+    <color name="background_color">#F0F5F2</color>
+    <color name="surface_color">#FFFFFF</color>
+    <color name="text_primary">#2A3A30</color>
+    <color name="text_primary_color">#2A3A30</color>
+    <color name="text_secondary">#6B7A70</color>
+    <color name="text_secondary_color">#6B7A70</color>
+    <color name="text_hint">#9CABA2</color>
+    <color name="border_color">#D8E4DC</color>
+    <color name="overlay_color">#2A3A3080</color>
+
+    <!-- Surface相关色值 -->
+    <color name="background_surface">#F0F5F2</color>
+    <color name="surface_variant">#F8FAF9</color>
+    <color name="surface_secondary">#F2F7F4</color>
+    <color name="on_surface">#2A3A30</color>
+    <color name="on_surface_variant">#6B7A70</color>
+
+    <!-- 其他基础色 -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- 交互状态色 -->
+    <color name="hover_color">#6D947C</color>
+    <color name="pressed_color">#4A6E59</color>
+    <color name="focus_color">#5A826D40</color>
+    <color name="disabled_color">#E8EFEA</color>
+    <color name="link_color">#4A8C6D</color>
+
+    <!-- 图表色系 -->
+    <color name="chart_color_1">#5A826D</color>
+    <color name="chart_color_2">#8CAE9B</color>
+    <color name="chart_color_3">#C8A89A</color>
+    <color name="chart_color_4">#7AA6C5</color>
+    <color name="chart_color_5">#E6B98A</color>
+    <color name="chart_color_6">#A58CD8</color>
+    <color name="chart_color_7">#6BA582</color>
+    <color name="chart_color_8">#D4A5A5</color>
+
+    <!-- 分类色系 -->
+    <color name="category_food">#5A826D</color>
+    <color name="category_transport">#8CAE9B</color>
+    <color name="category_shopping">#C8A89A</color>
+    <color name="category_entertainment">#7AA6C5</color>
+    <color name="category_medical">#A58CD8</color>
+    <color name="category_education">#E6B98A</color>
+    <color name="category_living">#6BA582</color>
+    <color name="category_other">#B8C9C1</color>
+
+    <!-- 预算状态色 -->
+    <color name="budget_sufficient">#6BA582</color>
+    <color name="budget_warning">#E6B98A</color>
+    <color name="budget_exceeded">#E6A2A2</color>
+    <color name="budget_critical">#EF7E5C</color>
+
+    <!-- 收入支出层次色 -->
+    <color name="income_high">#4A8C6D</color>
+    <color name="income_medium">#6BA582</color>
+    <color name="income_low">#8CC0A3</color>
+    <color name="expense_high">#C8A89A</color>
+    <color name="expense_medium">#D4A5A5</color>
+    <color name="expense_low">#E6B98A</color>
+    <color name="overspending">#EF7E5C</color>
+
+    <color name="primary_color_ripple">#6D947C</color>
+
+</resources>

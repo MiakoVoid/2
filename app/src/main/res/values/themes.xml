@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.GreenFinance" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/secondary_color</item>
+        <item name="colorOnPrimaryContainer">@color/text_primary</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary_color</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/background_color</item>
+        <item name="colorOnSecondaryContainer">@color/text_primary</item>
+
+        <!-- Tertiary brand color. -->
+        <item name="colorTertiary">@color/accent_color</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">@color/brand_auxiliary</item>
+        <item name="colorOnTertiaryContainer">@color/text_primary</item>
+
+        <!-- Error color. -->
+        <item name="colorError">@color/error_color</item>
+        <item name="colorOnError">@color/white</item>
+        <item name="colorErrorContainer">@color/background_color</item>
+        <item name="colorOnErrorContainer">@color/text_primary</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/primary_color</item>
+
+        <!-- Navigation bar color. -->
+        <item name="android:navigationBarColor">@color/surface_color</item>
+
+        <!-- Surface and background colors. -->
+        <item name="colorSurface">@color/surface_color</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/background_color</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="android:colorBackground">@color/background_color</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+
+        <!-- Text colors. -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorTertiary">@color/text_hint</item>
+
+        <!-- Outline color. -->
+        <item name="colorOutline">@color/border_color</item>
+
+        <!-- Dialog theme. -->
+        <item name="alertDialogTheme">@style/ThemeOverlay.Material3.Dialog.Alert</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Material3.MaterialAlertDialog</item>
+    </style>
+</resources>

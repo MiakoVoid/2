@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_surface">
+
+    <!-- 顶部导航栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="返回"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/tv_expense"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="支出"
+            android:textColor="@color/expense_color"
+            android:textSize="16sp"
+            app:drawableBottomCompat="@drawable/selector_tab_indicator" />
+
+        <TextView
+            android:id="@+id/tv_income"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="收入"
+            android:textColor="@color/income_color"
+            android:textSize="16sp"
+            app:drawableBottomCompat="@drawable/selector_tab_indicator" />
+
+        <TextView
+            android:id="@+id/tv_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="编辑"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <!-- 动态分类容器（使用RecyclerView支持动态加载） -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_categories"
+        android:layout_width="match_parent"
+        android:layout_height="155dp"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        tools:listitem="@layout/item_category" />
+
+    <!-- 商户名称输入区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="@color/white"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="商户名称"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_merchant"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="请输入商户名称"
+            android:inputType="text"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/layout_date_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingStart="16dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:contentDescription="日期"
+                android:src="@drawable/ic_calendar"
+                app:tint="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="今天"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 备注输入区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="@color/white"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/et_remark"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="添加备注"
+            android:inputType="text"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_amount_prefix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¥"
+                android:textColor="@color/text_primary"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00"
+                android:textColor="@color/expense_color"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 数字输入器区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:layout_marginTop="8dp"
+        android:padding="16dp">
+
+        <!-- 第一行数字键 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_number_1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="1"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_number_2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="2"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_number_3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="3"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <ImageButton
+                android:id="@+id/btn_delete"
+                style="@style/NumberSpecialButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="删除"
+                android:scaleType="center"
+                app:tint="@color/text_primary" />
+        </LinearLayout>
+
+        <!-- 第二行数字键 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_number_4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="4"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_number_5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="5"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_number_6"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="6"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_subtract"
+                style="@style/NumberOperatorButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="-"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <!-- 第三行数字键 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_number_7"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="7"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_number_8"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="8"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_number_9"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="9"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_add"
+                style="@style/NumberOperatorButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="+"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <!-- 第四行数字键 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_record_again"
+                style="@style/NumberSpecialButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="再记"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btn_number_0"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                android:text="0"
+                android:textSize="24sp"
+                style="@style/NumberButtonStyle" />
+
+            <Button
+                android:id="@+id/btn_decimal_point"
+                style="@style/NumberButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="."
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/btn_save"
+                style="@style/NumberOperatorButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:text="保存"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_manual_billing"
+        android:title="手动记账"
+        android:icon="@drawable/ic_manual_add" />
+
+    <item
+        android:id="@+id/menu_camera_billing"
+        android:title="拍照记账"
+        android:icon="@drawable/ic_photo_add" />
+
+    <item
+        android:id="@+id/menu_text_billing"
+        android:title="文字记账"
+        android:icon="@drawable/ic_text_add" />
+</menu>

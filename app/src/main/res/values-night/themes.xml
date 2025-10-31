@@ -1,0 +1,44 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.GreenFinance" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary_color</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary_color</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Background color -->
+        <item name="android:windowBackground">@color/background_color</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <!-- Component colors -->
+        <item name="colorError">@color/error_color</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <!-- Shape appearance -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.GreenFinance.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.GreenFinance.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.GreenFinance.LargeComponent</item>
+    </style>
+
+    <style name="Theme.GreenFinance" parent="Base.Theme.GreenFinance" />
+
+    <!-- Shape appearances for consistent rounded corners -->
+    <style name="ShapeAppearance.GreenFinance.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ShapeAppearance.GreenFinance.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearance.GreenFinance.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+</resources>
