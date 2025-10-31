@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="expectedExpense"
-            type="com.example.greenfinance.model.ExpectedExpense" />
+            type="com.example.greenfinance.data.model.ExpectedExpense" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

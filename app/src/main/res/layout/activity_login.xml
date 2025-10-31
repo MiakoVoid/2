@@ -6,7 +6,7 @@
     <data>
         <variable
             name="authViewModel"
-            type="com.example.greenfinance.AuthViewModel" />
+            type="com.example.greenfinance.presentation.auth.viewmodel.AuthViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

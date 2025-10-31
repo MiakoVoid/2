@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.android.application)
 }
 
 android {
@@ -18,7 +18,6 @@ android {
 
     buildFeatures {
         dataBinding = true
-
     }
 
     buildTypes {
@@ -34,6 +33,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    // 添加注解处理器配置
+    configurations {
+        create("lombok")
     }
 }
 
@@ -54,11 +58,19 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
 
+    // 安全存储
+    implementation(libs.security.crypto)
+
     // 图片加载
     implementation(libs.glide)
     implementation(libs.navigation.runtime.android)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+
+    // Lombok
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+    "lombok"("org.projectlombok:lombok:1.18.30")
 
     // 测试依赖
     testImplementation(libs.junit)
