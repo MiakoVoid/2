@@ -5,18 +5,18 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.Observer;
 
-import com.example.greenfinance.R;
-import com.example.greenfinance.common.base.BaseActivity;
 import com.example.greenfinance.common.util.SecurePreferences;
 import com.example.greenfinance.data.model.AuthResult;
 import com.example.greenfinance.databinding.ActivityLoginBinding;
 import com.example.greenfinance.presentation.auth.viewmodel.AuthViewModel;
 import com.example.greenfinance.presentation.home.view.MainActivity;
 
-public class LoginActivity extends BaseActivity {
+import java.util.Objects;
+
+public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private AuthViewModel authViewModel;
@@ -71,20 +71,17 @@ public class LoginActivity extends BaseActivity {
         androidx.lifecycle.LiveData<AuthResult> loginResult = 
             authViewModel.login(username, password, true);
         
-        loginResult.observe(this, new Observer<AuthResult>() {
-            @Override
-            public void onChanged(AuthResult result) {
-                binding.loginButton.setText("登录");
-                binding.loginButton.setEnabled(true);
-                
-                if (result.isSuccess()) {
-                    // 自动登录成功，跳转到主页
-                    Toast.makeText(LoginActivity.this, "自动登录成功", Toast.LENGTH_SHORT).show();
-                    goToMainActivity();
-                } else {
-                    // 自动登录失败，显示错误信息
-                    Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+        loginResult.observe(this, result -> {
+            binding.loginButton.setText("登录");
+            binding.loginButton.setEnabled(true);
+
+            if (result.isSuccess()) {
+                // 自动登录成功，跳转到主页
+                Toast.makeText(LoginActivity.this, "自动登录成功", Toast.LENGTH_SHORT).show();
+                goToMainActivity();
+            } else {
+                // 自动登录失败，显示错误信息
+                Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -102,8 +99,8 @@ public class LoginActivity extends BaseActivity {
 
     private void attemptLogin() {
         // 获取输入的用户名和密码
-        String username = binding.usernameInput.getText().toString().trim();
-        String password = binding.passwordInput.getText().toString().trim();
+        String username = Objects.requireNonNull(binding.usernameInput.getText()).toString().trim();
+        String password = Objects.requireNonNull(binding.passwordInput.getText()).toString().trim();
 
         // 验证输入
         if (TextUtils.isEmpty(username)) {
@@ -128,20 +125,17 @@ public class LoginActivity extends BaseActivity {
         boolean rememberMe = binding.rememberMeCheckbox.isChecked();
         androidx.lifecycle.LiveData<AuthResult> loginResult = authViewModel.login(username, password, rememberMe);
         
-        loginResult.observe(this, new Observer<AuthResult>() {
-            @Override
-            public void onChanged(AuthResult result) {
-                binding.loginButton.setText("登录");
-                binding.loginButton.setEnabled(true);
-                
-                if (result.isSuccess()) {
-                    // 登录成功，跳转到主页
-                    Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                    goToMainActivity();
-                } else {
-                    // 登录失败，显示错误信息
-                    Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+        loginResult.observe(this, result -> {
+            binding.loginButton.setText("登录");
+            binding.loginButton.setEnabled(true);
+
+            if (result.isSuccess()) {
+                // 登录成功，跳转到主页
+                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                goToMainActivity();
+            } else {
+                // 登录失败，显示错误信息
+                Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -152,8 +146,4 @@ public class LoginActivity extends BaseActivity {
         finish();
     }
 
-    @Override
-    protected void handleAddButtonClick() {
-        // 登录页面不需要处理添加按钮
-    }
 }

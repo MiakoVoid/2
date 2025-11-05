@@ -20,6 +20,7 @@ public class SecurePreferences {
     private static final String KEY_TOKEN = "token";
     private static final String KEY_LOGIN_TIME = "login_time";
     private static final String KEY_REMEMBER_ME = "remember_me";
+    //7 * 24 * 60 * 60 * 1000L
     private static final Long KEY_EXPIRED_TIME = 7 * 24 * 60 * 60 * 1000L; // 7天过期时间;
     
     private static SharedPreferences sharedPreferences;

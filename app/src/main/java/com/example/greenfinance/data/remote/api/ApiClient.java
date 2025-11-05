@@ -76,4 +76,5 @@ public class ApiClient {
     public static AuthService getAuthService() {
         return getClient().create(AuthService.class);
     }
+
 }

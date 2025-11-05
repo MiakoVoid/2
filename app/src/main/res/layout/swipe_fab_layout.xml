@@ -7,8 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/white"
-        android:elevation="8dp"
+        android:background="@color/surface_color"
+        android:elevation="12dp"
         app:menu="@menu/bottom_navigation_menu"
         app:itemIconTint="@color/bottom_nav_item_color"
         app:itemTextColor="@color/bottom_nav_item_color"
@@ -20,12 +20,22 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/ic_add"
+        android:contentDescription="@string/add_bill"
+        android:src="@drawable/ic_add_bill"
         app:backgroundTint="@color/primary_color"
-        app:tint="@color/white"
         app:elevation="8dp"
         app:pressedTranslationZ="12dp"
         app:rippleColor="@color/primary_color_ripple"
-        android:contentDescription="@string/add_bill" />
+        app:tint="@color/white"
+        app:borderWidth="0dp"
+        app:fabSize="normal"
+        app:shapeAppearanceOverlay="@style/FloatingActionButtonRounded" />
+
+    <FrameLayout
+        android:id="@+id/fab_container"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="28dp" />
 
 </merge>

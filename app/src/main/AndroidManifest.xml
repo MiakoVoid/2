@@ -2,15 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -21,36 +13,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GreenFinance"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
-        <!-- 登录页面 -->
         <activity
             android:name=".presentation.auth.view.LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.GreenFinance"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <!-- 主页面 -->
-        <activity
-            android:name=".presentation.home.view.MainActivity"
-            android:exported="true">
-        </activity>
-
-        <!-- 注册页面 -->
         <activity
             android:name=".presentation.auth.view.RegisterActivity"
-            android:exported="false" />
-        <!-- <activity
-            android:name=".presentation.bill.view.AddBillActivity"
             android:exported="false"
-            android:label="@string/add_bill"
-            android:theme="@style/Theme.GreenFinance" /> -->
-
+            android:theme="@style/Theme.GreenFinance" />
+        <activity
+            android:name=".presentation.home.view.MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GreenFinance"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.bill.view.ScreenshotBillingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GreenFinance" />
+        <activity
+            android:name=".presentation.bill.view.ManualBillingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GreenFinance" />
     </application>
 
 </manifest>

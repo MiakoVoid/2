@@ -4,29 +4,28 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import androidx.lifecycle.ViewModelProvider;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.greenfinance.R;
-import com.example.greenfinance.common.base.BaseActivity;
+import com.example.greenfinance.common.util.FabGestureHandler;
 import com.example.greenfinance.common.util.SecurePreferences;
-import com.example.greenfinance.databinding.ActivityMainBinding;
-import com.example.greenfinance.data.model.Bill;
 import com.example.greenfinance.presentation.auth.view.LoginActivity;
-import com.example.greenfinance.presentation.home.adapter.BillAdapter;
-import com.example.greenfinance.presentation.home.viewmodel.HomeViewModel;
+import com.example.greenfinance.presentation.bill.view.TextBillingDialogFragment;
+import com.example.greenfinance.presentation.calendar.view.CalendarFragment;
+import com.example.greenfinance.presentation.profile.view.ProfileFragment;
+import com.example.greenfinance.presentation.report.view.ReportFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+public class MainActivity extends AppCompatActivity implements FabGestureHandler.OnFabClickListener {
 
-public class MainActivity extends BaseActivity {
-
-    private ActivityMainBinding binding;
-    private HomeViewModel viewModel;
-    private BillAdapter billAdapter;
     private boolean isBatchMode = false;
+    private int currentNavigationItemId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,20 +37,17 @@ public class MainActivity extends BaseActivity {
             return;
         }
 
-        // 使用DataBinding加载布局
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        // 初始化ViewModel
-        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
-        // 将ViewModel绑定到布局
-        binding.setLifecycleOwner(this);
-        binding.setViewModel(viewModel); // 启用ViewModel数据绑定
-
-        // 初始化账单适配器
-        initBillAdapter();
-
+        // 设置布局
+        setContentView(R.layout.activity_main_container);
+        
+        // 初始化视图
+        initViews();
+        
+        // 默认显示首页Fragment
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment(), false);
+            currentNavigationItemId = R.id.nav_home;
+        }
     }
 
     private boolean isUserLoggedIn() {
@@ -75,7 +71,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_search) {
             // TODO: 实现搜索功能
@@ -89,71 +85,112 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initViews() {
-        // 通过DataBinding访问视图组件
-    }
-
-    private void initBillAdapter() {
-        billAdapter = new BillAdapter();
-        binding.rvRecentBills.setAdapter(billAdapter);
+        setupNavigationAndGestures();
         
-        // 添加示例数据
-        List<Bill> sampleBills = createSampleBills();
-        billAdapter.setBills(sampleBills);
-    }
-
-    private List<Bill> createSampleBills() {
-        List<Bill> bills = new ArrayList<>();
+        // 设置当前选中的导航项
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        if (bottomNavigation != null) {
+            bottomNavigation.setSelectedItemId(R.id.nav_home);
+        }
         
-        // 创建示例账单数据
-        Date now = new Date();
-        bills.add(new Bill(1, new BigDecimal("25.50"), "餐饮", "麦当劳", now));
-        bills.add(new Bill(2, new BigDecimal("18.00"), "交通", "地铁", now));
-        
-        // 添加昨天的账单
-        Date yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        bills.add(new Bill(3, new BigDecimal("89.90"), "购物", "超市购物", yesterday));
-        bills.add(new Bill(4, new BigDecimal("12.00"), "餐饮", "便利店", yesterday));
-        
-        // 添加前天的账单
-        Date twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-        bills.add(new Bill(5, new BigDecimal("35.50"), "餐饮", "肯德基", twoDaysAgo));
-        
-        return bills;
-    }
-
-
-    private void setupClickListeners() {
-        // 使用正确的ID引用管理预算按钮
-        binding.btnManageBudget.setOnClickListener(v -> {
-            // TODO: 跳转到预算管理页面
-        });
+        // 设置浮动按钮手势检测
+        setupFabGestures();
     }
 
     /**
-     * 显示添加账单选项菜单
+     * 设置底部导航和手势处理
      */
-    private void showAddBillOptions() {
-        // TODO: 实现三种记账方式的选择菜单
-        // 1. 手动记账
-        // 2. 截图记账
-        // 3. 文本记账
+    protected void setupNavigationAndGestures() {
+        // 添加Fragment切换逻辑
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        if (bottomNavigation != null) {
+            bottomNavigation.setOnItemSelectedListener(item -> {
+                // 避免重复选择相同项
+                if (currentNavigationItemId == item.getItemId()) {
+                    return true;
+                }
+                
+                Fragment selectedFragment = null;
+                int itemId = item.getItemId();
+                
+                if (itemId == R.id.nav_home) {
+                    selectedFragment = new HomeFragment();
+                } else if (itemId == R.id.nav_calendar) {
+                    selectedFragment = new CalendarFragment();
+                } else if (itemId == R.id.nav_report) {
+                    selectedFragment = new ReportFragment();
+                } else if (itemId == R.id.nav_profile) {
+                    selectedFragment = new ProfileFragment();
+                }
+                
+                // 注意：nav_add（添加按钮）不处理，因为它是FAB按钮
+                if (selectedFragment != null) {
+                    loadFragment(selectedFragment, false);
+                    currentNavigationItemId = itemId;
+                }
+                
+                return true;
+            });
+        }
+    }
+    
+    /**
+     * 设置浮动按钮手势检测
+     */
+    private void setupFabGestures() {
+        FloatingActionButton fab = findViewById(R.id.fab_add_bill);
+        View fabContainer = findViewById(R.id.fab_container);
+        
+        // 创建手势处理器
+        FabGestureHandler fabGestureHandler = new FabGestureHandler(this);
+        
+        // 设置触摸监听器
+        View.OnTouchListener touchListener = fabGestureHandler;
+
+        // 为FAB和容器设置触摸监听器
+        if (fab != null) {
+            fab.setOnTouchListener(touchListener);
+            fabGestureHandler.setAttachedView(fab);
+        }
+        
+        if (fabContainer != null) {
+            fabContainer.setOnTouchListener(touchListener);
+        }
     }
 
+    /**
+     * 加载Fragment
+     * @param fragment 要加载的Fragment
+     * @param addToBackStack 是否添加到回退栈
+     */
+    private void loadFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        
+        // 设置淡入淡出过渡动画，营造内容变化而非页面跳转的视觉感受
+        transaction.setCustomAnimations(
+                R.anim.fade_in, 
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.fade_out
+        );
+        
+        // 替换Fragment
+        transaction.replace(R.id.nav_host_fragment, fragment);
+        
+        // 添加到回退栈（可选）
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
+        
+        // 提交事务
+        transaction.commit();
+    }
+    
     @Override
-    protected void handleAddButtonClick() {
-        showAddBillOptions();
-    }
-
-    /**
-     * 初始化首页数据
-     * 包括财务概览、预算信息和账单列表
-     */
-    private void initHomeData() {
-        // 由于已使用DataBinding，此处不再需要手动设置文本
-        // 数据将通过ViewModel自动绑定到UI上
-
-        // TODO: 初始化RecyclerView数据
-        //初始化账单列表、预算、财务概览等
+    public void onFabClick() {
+        // 在任何页面点击都可以打开文字记账弹窗
+        TextBillingDialogFragment textBillingDialog = new TextBillingDialogFragment();
+        textBillingDialog.show(getSupportFragmentManager(), "text_billing_dialog");
     }
 
     /**
@@ -165,6 +202,7 @@ public class MainActivity extends BaseActivity {
         // 在批量处理模式下，分类图标应变成方框用来选中
         invalidateOptionsMenu();
     }
+    
     /**
      * 根据批量处理模式更新菜单项
      */
@@ -180,8 +218,10 @@ public class MainActivity extends BaseActivity {
         }
         return super.onPrepareOptionsMenu(menu);
     }
-    //批量删除账单
-    private void deleteSelectedBills() {
-        // TODO: 删除选中的账单
+    
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }

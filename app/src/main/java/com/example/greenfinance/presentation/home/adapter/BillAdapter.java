@@ -9,17 +9,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenfinance.R;
+import com.example.greenfinance.common.util.BillDateGroupUtil;
 import com.example.greenfinance.data.model.Bill;
 import com.example.greenfinance.data.model.BillHeader;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
 
 public class BillAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -36,29 +33,9 @@ public class BillAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void setBills(List<Bill> bills) {
         items.clear();
         
-        // 按日期分组
-        Map<String, List<Bill>> groupedBills = new TreeMap<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        
-        for (Bill bill : bills) {
-            String dateKey = dateFormat.format(bill.getBillTime());
-            if (!groupedBills.containsKey(dateKey)) {
-                groupedBills.put(dateKey, new ArrayList<>());
-            }
-            Objects.requireNonNull(groupedBills.get(dateKey)).add(bill);
-        }
-        
-        // 将分组数据添加到列表中
-        SimpleDateFormat displayFormat = new SimpleDateFormat("M月d日 E", Locale.getDefault());
-        for (Map.Entry<String, List<Bill>> entry : groupedBills.entrySet()) {
-            try {
-                Date date = dateFormat.parse(entry.getKey());
-                String displayDate = displayFormat.format(date);
-                items.add(new BillHeader(displayDate));
-                items.addAll(entry.getValue());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        // 使用工具类进行分组
+        if (bills != null) {
+            items.addAll(BillDateGroupUtil.groupBillsByDate(bills));
         }
         
         notifyDataSetChanged();

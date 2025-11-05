@@ -8,11 +8,11 @@
     <string name="remember_me">记住我</string>
     <string name="no_account_text">还没有账号？</string>
     <string name="has_account_text">已有账号？</string>
-    <string name="home">首页</string>
-    <string name="calendar">日历</string>
-    <string name="add">添加</string>
-    <string name="report">报表</string>
-    <string name="mine">我的</string>
+    <string name="title_home">首页</string>
+    <string name="title_calendar">日历</string>
+    <string name="title_add">添加</string>
+    <string name="title_report">报表</string>
+    <string name="title_profile">我的</string>
     <string name="add_bill">添加账单</string>
     <string name="confirm_password_hint">确认密码</string>
 </resources>

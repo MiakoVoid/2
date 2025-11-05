@@ -58,4 +58,9 @@
         <item name="colorOnSurfaceInverse">@color/text_primary</item>
         <item name="colorOutlineVariant">@color/border_color</item>
     </style>
+
+    <style name="FloatingActionButtonRounded" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
+    </style>
 </resources>

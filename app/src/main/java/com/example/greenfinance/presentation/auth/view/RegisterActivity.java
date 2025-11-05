@@ -4,16 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.Observer;
 
-import com.example.greenfinance.R;
-import com.example.greenfinance.common.base.BaseActivity;
 import com.example.greenfinance.data.model.AuthResult;
 import com.example.greenfinance.databinding.ActivityRegisterBinding;
 import com.example.greenfinance.presentation.auth.viewmodel.AuthViewModel;
 
-public class RegisterActivity extends BaseActivity {
+import java.util.Objects;
+
+public class RegisterActivity extends AppCompatActivity {
 
     private ActivityRegisterBinding binding;
     private AuthViewModel authViewModel;
@@ -46,33 +46,26 @@ public class RegisterActivity extends BaseActivity {
 
     private void attemptRegister() {
         // 获取输入的用户名和密码
-        String username = binding.usernameInput.getText().toString().trim();
-        String password = binding.passwordInput.getText().toString().trim();
-        String confirmPassword = binding.confirmPasswordInput.getText().toString().trim();
+        String username = Objects.requireNonNull(binding.usernameInput.getText()).toString().trim();
+        String password = Objects.requireNonNull(binding.passwordInput.getText()).toString().trim();
+        String confirmPassword = Objects.requireNonNull(binding.confirmPasswordInput.getText()).toString().trim();
 
         // 调用ViewModel进行注册
         androidx.lifecycle.LiveData<AuthResult> registerResult = 
             authViewModel.register(username, password, confirmPassword);
         
-        registerResult.observe(this, new Observer<AuthResult>() {
-            @Override
-            public void onChanged(AuthResult result) {
-                if (result.isSuccess()) {
-                    // 注册成功，跳转到登录页面
-                    Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    // 注册失败，显示错误信息
-                    Toast.makeText(RegisterActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+        registerResult.observe(this, result -> {
+            if (result.isSuccess()) {
+                // 注册成功，跳转到登录页面
+                Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                // 注册失败，显示错误信息
+                Toast.makeText(RegisterActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    @Override
-    protected void handleAddButtonClick() {
-        // 注册页面不需要处理添加按钮
-    }
 }
