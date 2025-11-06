@@ -1,5 +1,7 @@
 package com.example.greenfinance.common.util;
 
+import android.util.Log;
+
 import com.example.greenfinance.data.model.Bill;
 import com.example.greenfinance.data.model.BillHeader;
 
@@ -10,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -19,6 +22,8 @@ import java.util.TreeMap;
  */
 public class BillDateGroupUtil {
 
+    private static final String TAG = "BillDateGroupUtil"; // 添加日志标签
+
     /**
      * 将账单列表按日期分组
      * @param bills 账单列表
@@ -26,41 +31,46 @@ public class BillDateGroupUtil {
      */
     public static List<Object> groupBillsByDate(List<Bill> bills) {
         List<Object> groupedItems = new ArrayList<>();
-        
+
         if (bills == null || bills.isEmpty()) {
             return groupedItems;
         }
-        
+
         // 按日期分组
         Map<String, List<Bill>> groupedBills = new TreeMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        
+
         for (Bill bill : bills) {
             // 处理空时间情况
             if (bill.getBillTime() == null) {
                 continue;
             }
-            
+
             String dateKey = dateFormat.format(bill.getBillTime());
             if (!groupedBills.containsKey(dateKey)) {
                 groupedBills.put(dateKey, new ArrayList<>());
             }
-            groupedBills.get(dateKey).add(bill);
+            Objects.requireNonNull(groupedBills.get(dateKey)).add(bill);
         }
-        
-        // 将分组数据添加到列表中
-        SimpleDateFormat displayFormat = new SimpleDateFormat("M月d日 E", Locale.getDefault());
+
+        SimpleDateFormat displayFormat = new SimpleDateFormat("M月d日 E", Locale.CHINA);
         // 获取今天和昨天的日期
         Calendar today = Calendar.getInstance();
         Calendar yesterday = Calendar.getInstance();
         yesterday.add(Calendar.DAY_OF_YEAR, -1);
-        
-        for (Map.Entry<String, List<Bill>> entry : groupedBills.entrySet()) {
+
+        // 创建一个倒序的列表
+        List<Map.Entry<String, List<Bill>>> entries = new ArrayList<>(groupedBills.entrySet());
+        // 反转列表顺序
+        java.util.Collections.reverse(entries);
+
+        for (Map.Entry<String, List<Bill>> entry : entries) {
             try {
                 Date date = dateFormat.parse(entry.getKey());
                 Calendar entryDate = Calendar.getInstance();
+                assert date != null;
                 entryDate.setTime(date);
-                
+
                 String displayDate;
                 // 检查是否是今天
                 if (isSameDay(entryDate, today)) {
@@ -73,22 +83,23 @@ public class BillDateGroupUtil {
                 // 其他日期使用常规格式
                 else {
                     displayDate = displayFormat.format(date);
-                    // 使用"周"格式而不是"星期"格式
+                    // 确保显示为"周"而不是"星期"
                     if (displayDate.contains("星期")) {
                         displayDate = displayDate.replace("星期", "周");
                     }
                 }
-                
+
                 groupedItems.add(new BillHeader(displayDate));
                 groupedItems.addAll(entry.getValue());
             } catch (Exception e) {
-                e.printStackTrace();
+                // 使用Log类进行更健壮的日志记录
+                Log.e(TAG, "Error processing bill date grouping", e);
             }
         }
-        
+
         return groupedItems;
     }
-    
+
     /**
      * 检查两个日期是否是同一天
      * @param cal1 第一个日期
@@ -97,6 +108,6 @@ public class BillDateGroupUtil {
      */
     private static boolean isSameDay(Calendar cal1, Calendar cal2) {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-               cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 }

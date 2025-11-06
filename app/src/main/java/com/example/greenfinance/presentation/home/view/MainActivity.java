@@ -2,6 +2,7 @@ package com.example.greenfinance.presentation.home.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity implements FabGestureHandler.OnFabClickListener {
+    private static final String TAG = "MainActivity";
 
     private boolean isBatchMode = false;
     private int currentNavigationItemId = -1;
@@ -39,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements FabGestureHandler
 
         // 设置布局
         setContentView(R.layout.activity_main_container);
-        
+
         // 初始化视图
         initViews();
-        
+
         // 默认显示首页Fragment
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment(), false);
@@ -51,110 +53,152 @@ public class MainActivity extends AppCompatActivity implements FabGestureHandler
     }
 
     private boolean isUserLoggedIn() {
-        // 初始化安全存储
-        SecurePreferences.init(this);
-        
-        // 检查是否有保存的token且未过期
-        return SecurePreferences.getToken() != null && !SecurePreferences.isTokenExpired();
+        try {
+            // 初始化安全存储
+            SecurePreferences.init(this);
+
+            // 检查是否有保存的token且未过期
+            String token = SecurePreferences.getToken();
+            boolean isTokenExpired = SecurePreferences.isTokenExpired();
+
+            Log.d(TAG, "Token: " + token + ", Expired: " + isTokenExpired);
+
+            return token != null && !isTokenExpired;
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking user login status", e);
+            return false;
+        }
     }
 
     private void redirectToLogin() {
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(intent);
-        finish();
+        try {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            Log.e(TAG, "Error redirecting to login", e);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home_menu, menu);
-        return true;
+        try {
+            getMenuInflater().inflate(R.menu.home_menu, menu);
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating options menu", e);
+            return false;
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_search) {
-            // TODO: 实现搜索功能
-            return true;
-        } else if (id == R.id.action_batch) {
-            // 切换批量处理模式
-            toggleBatchMode();
-            return true;
+        try {
+            int id = item.getItemId();
+            if (id == R.id.action_search) {
+                // TODO: 实现搜索功能
+                return true;
+            } else if (id == R.id.action_batch) {
+                // 切换批量处理模式
+                toggleBatchMode();
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        } catch (Exception e) {
+            Log.e(TAG, "Error handling menu item selection", e);
+            return false;
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private void initViews() {
-        setupNavigationAndGestures();
-        
-        // 设置当前选中的导航项
-        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
-        if (bottomNavigation != null) {
-            bottomNavigation.setSelectedItemId(R.id.nav_home);
+        try {
+            setupNavigationAndGestures();
+
+            // 设置当前选中的导航项
+            BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+            if (bottomNavigation != null) {
+                bottomNavigation.setSelectedItemId(R.id.nav_home);
+            }
+
+            // 设置浮动按钮手势检测
+            setupFabGestures();
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing views", e);
         }
-        
-        // 设置浮动按钮手势检测
-        setupFabGestures();
     }
 
     /**
      * 设置底部导航和手势处理
      */
     protected void setupNavigationAndGestures() {
-        // 添加Fragment切换逻辑
-        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
-        if (bottomNavigation != null) {
-            bottomNavigation.setOnItemSelectedListener(item -> {
-                // 避免重复选择相同项
-                if (currentNavigationItemId == item.getItemId()) {
-                    return true;
-                }
-                
-                Fragment selectedFragment = null;
-                int itemId = item.getItemId();
-                
-                if (itemId == R.id.nav_home) {
-                    selectedFragment = new HomeFragment();
-                } else if (itemId == R.id.nav_calendar) {
-                    selectedFragment = new CalendarFragment();
-                } else if (itemId == R.id.nav_report) {
-                    selectedFragment = new ReportFragment();
-                } else if (itemId == R.id.nav_profile) {
-                    selectedFragment = new ProfileFragment();
-                }
-                
-                // 注意：nav_add（添加按钮）不处理，因为它是FAB按钮
-                if (selectedFragment != null) {
-                    loadFragment(selectedFragment, false);
-                    currentNavigationItemId = itemId;
-                }
-                
-                return true;
-            });
+        try {
+            // 添加Fragment切换逻辑
+            BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+            if (bottomNavigation != null) {
+                bottomNavigation.setOnItemSelectedListener(item -> {
+                    try {
+                        // 避免重复选择相同项
+                        if (currentNavigationItemId == item.getItemId()) {
+                            return true;
+                        }
+
+                        Fragment selectedFragment = null;
+                        int itemId = item.getItemId();
+
+                        if (itemId == R.id.nav_home) {
+                            selectedFragment = new HomeFragment();
+                        } else if (itemId == R.id.nav_calendar) {
+                            selectedFragment = new CalendarFragment();
+                        } else if (itemId == R.id.nav_report) {
+                            selectedFragment = new ReportFragment();
+                        } else if (itemId == R.id.nav_profile) {
+                            selectedFragment = new ProfileFragment();
+                        }
+
+                        // 注意：nav_add（添加按钮）不处理，因为它是FAB按钮
+                        if (selectedFragment != null) {
+                            loadFragment(selectedFragment, false);
+                            currentNavigationItemId = itemId;
+                        }
+
+                        return true;
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error handling navigation item selection", e);
+                        return false;
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting up navigation and gestures", e);
         }
     }
-    
+
     /**
      * 设置浮动按钮手势检测
+     * 修复：避免直接给FloatingActionButton设置OnTouchListener，因为这需要实现performClick方法
+     * 改为只给FAB的容器设置手势监听器，而FAB本身的点击事件独立处理
      */
     private void setupFabGestures() {
-        FloatingActionButton fab = findViewById(R.id.fab_add_bill);
-        View fabContainer = findViewById(R.id.fab_container);
-        
-        // 创建手势处理器
-        FabGestureHandler fabGestureHandler = new FabGestureHandler(this);
-        
-        // 设置触摸监听器
-        View.OnTouchListener touchListener = fabGestureHandler;
+        try {
+            FloatingActionButton fab = findViewById(R.id.fab_add_bill);
+            View fabContainer = findViewById(R.id.fab_container);
 
-        // 为FAB和容器设置触摸监听器
-        if (fab != null) {
-            fab.setOnTouchListener(touchListener);
-            fabGestureHandler.setAttachedView(fab);
-        }
-        
-        if (fabContainer != null) {
-            fabContainer.setOnTouchListener(touchListener);
+            // 创建手势处理器
+            FabGestureHandler fabGestureHandler = new FabGestureHandler(this);
+
+            // 不再直接给FAB设置触摸监听器，避免违反无障碍性要求
+
+            // 只将手势监听器附加到容器上
+            if (fabContainer != null) {
+                fabContainer.setOnTouchListener(fabGestureHandler);
+            }
+
+            // 使用setOnClickListener处理FAB的点击事件，满足无障碍性要求
+            if (fab != null) {
+                fab.setOnClickListener(v -> onFabClick());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting up FAB gestures", e);
         }
     }
 
@@ -164,64 +208,88 @@ public class MainActivity extends AppCompatActivity implements FabGestureHandler
      * @param addToBackStack 是否添加到回退栈
      */
     private void loadFragment(Fragment fragment, boolean addToBackStack) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        
-        // 设置淡入淡出过渡动画，营造内容变化而非页面跳转的视觉感受
-        transaction.setCustomAnimations(
-                R.anim.fade_in, 
-                R.anim.fade_out,
-                R.anim.fade_in,
-                R.anim.fade_out
-        );
-        
-        // 替换Fragment
-        transaction.replace(R.id.nav_host_fragment, fragment);
-        
-        // 添加到回退栈（可选）
-        if (addToBackStack) {
-            transaction.addToBackStack(null);
+        try {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // 设置淡入淡出过渡动画，营造内容变化而非页面跳转的视觉感受
+            transaction.setCustomAnimations(
+                    R.anim.fade_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.fade_out
+            );
+
+            // 替换Fragment
+            transaction.replace(R.id.nav_host_fragment, fragment);
+
+            // 添加到回退栈（可选）
+            if (addToBackStack) {
+                transaction.addToBackStack(null);
+            }
+
+            // 提交事务
+            transaction.commit();
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading fragment", e);
         }
-        
-        // 提交事务
-        transaction.commit();
     }
-    
+
     @Override
     public void onFabClick() {
-        // 在任何页面点击都可以打开文字记账弹窗
-        TextBillingDialogFragment textBillingDialog = new TextBillingDialogFragment();
-        textBillingDialog.show(getSupportFragmentManager(), "text_billing_dialog");
+        try {
+            // 在任何页面点击都可以打开文字记账弹窗
+            TextBillingDialogFragment textBillingDialog = new TextBillingDialogFragment();
+            textBillingDialog.show(getSupportFragmentManager(), "text_billing_dialog");
+        } catch (Exception e) {
+            Log.e(TAG, "Error handling FAB click", e);
+        }
     }
 
     /**
      * 切换批量处理模式
      */
     private void toggleBatchMode() {
-        isBatchMode = !isBatchMode;
-        // TODO: 更新UI以反映批量处理模式状态
-        // 在批量处理模式下，分类图标应变成方框用来选中
-        invalidateOptionsMenu();
+        try {
+            isBatchMode = !isBatchMode;
+            // TODO: 更新UI以反映批量处理模式状态
+            // 在批量处理模式下，分类图标应变成方框用来选中
+            invalidateOptionsMenu();
+        } catch (Exception e) {
+            Log.e(TAG, "Error toggling batch mode", e);
+        }
     }
-    
+
     /**
      * 根据批量处理模式更新菜单项
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem batchItem = menu.findItem(R.id.action_batch);
-        if (isBatchMode) {
-            batchItem.setIcon(R.drawable.ic_check_box_outline);
-            batchItem.setTitle("完成");
-        } else {
-            batchItem.setIcon(R.drawable.ic_check_box);
-            batchItem.setTitle("批量处理");
+        try {
+            MenuItem batchItem = menu.findItem(R.id.action_batch);
+            if (batchItem != null) {
+                if (isBatchMode) {
+                    batchItem.setIcon(R.drawable.ic_check_box_outline);
+                    batchItem.setTitle("完成");
+                } else {
+                    batchItem.setIcon(R.drawable.ic_check_box);
+                    batchItem.setTitle("批量处理");
+                }
+            }
+            return super.onPrepareOptionsMenu(menu);
+        } catch (Exception e) {
+            Log.e(TAG, "Error preparing options menu", e);
+            return super.onPrepareOptionsMenu(menu);
         }
-        return super.onPrepareOptionsMenu(menu);
     }
-    
+
     @Override
     public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        try {
+            super.finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        } catch (Exception e) {
+            Log.e(TAG, "Error finishing activity", e);
+            super.finish();
+        }
     }
 }

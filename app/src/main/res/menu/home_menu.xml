@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_check_box"
         android:title="批量处理"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_help"
+        android:icon="@drawable/ic_help"
+        android:title="帮助"
+        app:showAsAction="ifRoom" />
 </menu>

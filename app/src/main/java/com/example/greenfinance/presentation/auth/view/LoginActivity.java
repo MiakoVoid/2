@@ -3,6 +3,7 @@ package com.example.greenfinance.presentation.auth.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.example.greenfinance.presentation.home.view.MainActivity;
 import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
 
     private ActivityLoginBinding binding;
     private AuthViewModel authViewModel;
@@ -26,7 +28,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // 初始化安全存储
-        SecurePreferences.init(this);
+        try {
+            SecurePreferences.init(this);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize SecurePreferences", e);
+            Toast.makeText(this, "初始化安全存储失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
         
         // 使用DataBinding加载布局
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
@@ -43,107 +50,149 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void checkAutoLogin() {
-        // 检查token是否有效
-        if (authViewModel.isTokenValid()) {
-            // Token有效，直接跳转到主页
-            goToMainActivity();
-            return;
-        }
-        
-        // 检查是否有保存的凭据
-        AuthResult savedCredentials = authViewModel.getSavedCredentials();
-        if (savedCredentials != null && savedCredentials.isSuccess()) {
-            // 使用保存的凭据自动登录
-            String username = savedCredentials.getUser().getUsername();
-            String password = SecurePreferences.getPassword();
-            if (password != null) {
-                autoLogin(username, password);
+        try {
+            // 检查token是否有效
+            if (authViewModel.isTokenValid()) {
+                // Token有效，直接跳转到主页
+                goToMainActivity();
+                return;
             }
+            
+            // 检查是否有保存的凭据
+            AuthResult savedCredentials = authViewModel.getSavedCredentials();
+            if (savedCredentials != null && savedCredentials.isSuccess()) {
+                // 使用保存的凭据自动登录
+                String username = savedCredentials.getUser().getUsername();
+                String password = SecurePreferences.getPassword();
+                if (password != null) {
+                    autoLogin(username, password);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error during auto login check", e);
         }
     }
 
     private void autoLogin(String username, String password) {
-        // 显示自动登录进度
-        binding.loginButton.setText("自动登录中...");
-        binding.loginButton.setEnabled(false);
+        try {
+            // 显示自动登录进度
+            binding.loginButton.setText("自动登录中...");
+            binding.loginButton.setEnabled(false);
 
-        // 调用ViewModel进行自动登录
-        androidx.lifecycle.LiveData<AuthResult> loginResult = 
-            authViewModel.login(username, password, true);
-        
-        loginResult.observe(this, result -> {
+            // 调用ViewModel进行自动登录
+            androidx.lifecycle.LiveData<AuthResult> loginResult = 
+                authViewModel.login(username, password, true);
+            
+            loginResult.observe(this, result -> {
+                try {
+                    binding.loginButton.setText("登录");
+                    binding.loginButton.setEnabled(true);
+
+                    if (result.isSuccess()) {
+                        // 自动登录成功，跳转到主页
+                        Toast.makeText(LoginActivity.this, "自动登录成功", Toast.LENGTH_SHORT).show();
+                        goToMainActivity();
+                    } else {
+                        // 自动登录失败，显示错误信息
+                        Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error handling auto login result", e);
+                    binding.loginButton.setText("登录");
+                    binding.loginButton.setEnabled(true);
+                    Toast.makeText(LoginActivity.this, "自动登录处理失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Error initiating auto login", e);
             binding.loginButton.setText("登录");
             binding.loginButton.setEnabled(true);
-
-            if (result.isSuccess()) {
-                // 自动登录成功，跳转到主页
-                Toast.makeText(LoginActivity.this, "自动登录成功", Toast.LENGTH_SHORT).show();
-                goToMainActivity();
-            } else {
-                // 自动登录失败，显示错误信息
-                Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+            Toast.makeText(this, "自动登录启动失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setupClickListeners() {
-        // 登录按钮点击事件
-        binding.loginButton.setOnClickListener(v -> attemptLogin());
+        try {
+            // 登录按钮点击事件
+            binding.loginButton.setOnClickListener(v -> attemptLogin());
 
-        // 跳转到注册页面
-        binding.toRegisterButton.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
-        });
+            // 跳转到注册页面
+            binding.toRegisterButton.setOnClickListener(v -> {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting up click listeners", e);
+            Toast.makeText(this, "界面初始化失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void attemptLogin() {
-        // 获取输入的用户名和密码
-        String username = Objects.requireNonNull(binding.usernameInput.getText()).toString().trim();
-        String password = Objects.requireNonNull(binding.passwordInput.getText()).toString().trim();
+        try {
+            // 获取输入的用户名和密码
+            String username = Objects.requireNonNull(binding.usernameInput.getText()).toString().trim();
+            String password = Objects.requireNonNull(binding.passwordInput.getText()).toString().trim();
 
-        // 验证输入
-        if (TextUtils.isEmpty(username)) {
-            binding.usernameInputLayout.setError("请输入用户名");
-            return;
-        } else {
-            binding.usernameInputLayout.setError(null);
-        }
+            // 验证输入
+            if (TextUtils.isEmpty(username)) {
+                binding.usernameInputLayout.setError("请输入用户名");
+                return;
+            } else {
+                binding.usernameInputLayout.setError(null);
+            }
 
-        if (TextUtils.isEmpty(password)) {
-            binding.passwordInputLayout.setError("请输入密码");
-            return;
-        } else {
-            binding.passwordInputLayout.setError(null);
-        }
+            if (TextUtils.isEmpty(password)) {
+                binding.passwordInputLayout.setError("请输入密码");
+                return;
+            } else {
+                binding.passwordInputLayout.setError(null);
+            }
 
-        // 显示登录进度
-        binding.loginButton.setText("登录中...");
-        binding.loginButton.setEnabled(false);
+            // 显示登录进度
+            binding.loginButton.setText("登录中...");
+            binding.loginButton.setEnabled(false);
 
-        // 调用ViewModel进行登录
-        boolean rememberMe = binding.rememberMeCheckbox.isChecked();
-        androidx.lifecycle.LiveData<AuthResult> loginResult = authViewModel.login(username, password, rememberMe);
-        
-        loginResult.observe(this, result -> {
+            // 调用ViewModel进行登录
+            boolean rememberMe = binding.rememberMeCheckbox.isChecked();
+            androidx.lifecycle.LiveData<AuthResult> loginResult = authViewModel.login(username, password, rememberMe);
+            
+            loginResult.observe(this, result -> {
+                try {
+                    binding.loginButton.setText("登录");
+                    binding.loginButton.setEnabled(true);
+
+                    if (result.isSuccess()) {
+                        // 登录成功，跳转到主页
+                        Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                        goToMainActivity();
+                    } else {
+                        // 登录失败，显示错误信息
+                        Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error handling login result", e);
+                    binding.loginButton.setText("登录");
+                    binding.loginButton.setEnabled(true);
+                    Toast.makeText(LoginActivity.this, "登录结果处理失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Error attempting login", e);
             binding.loginButton.setText("登录");
             binding.loginButton.setEnabled(true);
-
-            if (result.isSuccess()) {
-                // 登录成功，跳转到主页
-                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                goToMainActivity();
-            } else {
-                // 登录失败，显示错误信息
-                Toast.makeText(LoginActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+            Toast.makeText(this, "登录处理失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
     
     private void goToMainActivity() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        try {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            Log.e(TAG, "Error navigating to main activity", e);
+            Toast.makeText(this, "跳转主页失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

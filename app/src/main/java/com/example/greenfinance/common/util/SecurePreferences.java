@@ -2,6 +2,7 @@ package com.example.greenfinance.common.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
@@ -14,6 +15,7 @@ import java.security.GeneralSecurityException;
  * 用于存储加密的用户凭据和token
  */
 public class SecurePreferences {
+    private static final String TAG = "SecurePreferences";
     private static final String PREFS_NAME = "greenfinance_secure_prefs";
     private static final String KEY_USERNAME = "username";
     private static final String KEY_PASSWORD = "password";
@@ -24,23 +26,33 @@ public class SecurePreferences {
     private static final Long KEY_EXPIRED_TIME = 7 * 24 * 60 * 60 * 1000L; // 7天过期时间;
     
     private static SharedPreferences sharedPreferences;
+    private static Context appContext; // 保存应用上下文
     
     public static void init(Context context) {
+        if (context == null) {
+            Log.e(TAG, "Context is null, cannot initialize SecurePreferences");
+            return;
+        }
+        
+        // 保存应用上下文引用
+        appContext = context.getApplicationContext();
+        
         try {
-            MasterKey masterKey = new MasterKey.Builder(context, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
+            MasterKey masterKey = new MasterKey.Builder(appContext, MasterKey.DEFAULT_MASTER_KEY_ALIAS)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build();
             
             sharedPreferences = EncryptedSharedPreferences.create(
-                    context,
+                    appContext,
                     PREFS_NAME,
                     masterKey,
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+            Log.d(TAG, "EncryptedSharedPreferences initialized successfully");
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to initialize EncryptedSharedPreferences, falling back to regular SharedPreferences", e);
             // 如果加密SharedPreferences不可用，回退到普通SharedPreferences
-            sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            sharedPreferences = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         }
     }
     
@@ -53,6 +65,8 @@ public class SecurePreferences {
             editor.putLong(KEY_LOGIN_TIME, System.currentTimeMillis());
             editor.putBoolean(KEY_REMEMBER_ME, rememberMe);
             editor.apply();
+        } else {
+            Log.w(TAG, "SharedPreferences is null, cannot save credentials");
         }
     }
     
@@ -98,5 +112,10 @@ public class SecurePreferences {
             editor.remove(KEY_REMEMBER_ME);
             editor.apply();
         }
+    }
+    
+    // 添加获取应用上下文的方法
+    public static Context getAppContext() {
+        return appContext;
     }
 }
