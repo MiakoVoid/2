@@ -33,6 +33,15 @@ public class TextBillingDialogFragment extends DialogFragment {
         // 创建自定义对话框
         return new Dialog(requireContext(), getTheme());
     }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        // 设置对话框的宽度
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+    }
 
     private void initViews(View view) {
         // 初始化视图组件

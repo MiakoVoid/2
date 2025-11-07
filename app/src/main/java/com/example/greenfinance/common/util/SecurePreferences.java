@@ -10,6 +10,8 @@ import androidx.security.crypto.MasterKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import lombok.Getter;
+
 /**
  * 安全的SharedPreferences工具类
  * 用于存储加密的用户凭据和token
@@ -26,6 +28,8 @@ public class SecurePreferences {
     private static final Long KEY_EXPIRED_TIME = 7 * 24 * 60 * 60 * 1000L; // 7天过期时间;
     
     private static SharedPreferences sharedPreferences;
+    // 添加获取应用上下文的方法
+    @Getter
     private static Context appContext; // 保存应用上下文
     
     public static void init(Context context) {
@@ -113,9 +117,5 @@ public class SecurePreferences {
             editor.apply();
         }
     }
-    
-    // 添加获取应用上下文的方法
-    public static Context getAppContext() {
-        return appContext;
-    }
+
 }

@@ -51,9 +51,9 @@ public class RegisterActivity extends AppCompatActivity {
         String confirmPassword = Objects.requireNonNull(binding.confirmPasswordInput.getText()).toString().trim();
 
         // 调用ViewModel进行注册
-        androidx.lifecycle.LiveData<AuthResult> registerResult = 
-            authViewModel.register(username, password, confirmPassword);
-        
+        androidx.lifecycle.LiveData<AuthResult> registerResult =
+                authViewModel.register(username, password, confirmPassword);
+
         registerResult.observe(this, result -> {
             if (result.isSuccess()) {
                 // 注册成功，跳转到登录页面

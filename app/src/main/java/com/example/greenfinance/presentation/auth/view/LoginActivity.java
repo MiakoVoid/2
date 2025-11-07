@@ -13,7 +13,7 @@ import com.example.greenfinance.common.util.SecurePreferences;
 import com.example.greenfinance.data.model.AuthResult;
 import com.example.greenfinance.databinding.ActivityLoginBinding;
 import com.example.greenfinance.presentation.auth.viewmodel.AuthViewModel;
-import com.example.greenfinance.presentation.home.view.MainActivity;
+import com.example.greenfinance.presentation.MainActivity;
 
 import java.util.Objects;
 

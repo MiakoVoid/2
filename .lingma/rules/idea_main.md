@@ -7,7 +7,7 @@ trigger: always_on
 ## 项目概述
 
 绿芽记账是一款基于AI智能识别的个人财务管理应用，通过创新的技术架构和优雅的用户体验，为用户提供便捷高效的财务管理服务。项目采用云端AI技术实现智能消费分类和分析，结合简洁直观的移动端界面，帮助用户轻松管理个人财务。
-
+任何地方不使用Toast
 ### 技术架构
 - 前端：Android Native (Java) + Material Design 3 + MVVM架构
 - 后端：Spring Boot 2.7 + MyBatis-Plus 3.5 + MySQL

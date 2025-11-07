@@ -80,5 +80,8 @@
     <color name="overspending">#EF7E5C</color>
 
     <color name="primary_color_ripple">#6D947C</color>
+    
+    <!-- 选中分类背景色 -->
+    <color name="selected_category_background">#E8F0EC</color>
 
 </resources>

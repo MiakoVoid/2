@@ -16,6 +16,10 @@ public class HomeViewModel extends ViewModel {
     private MutableLiveData<Integer> budgetProgressColor = new MutableLiveData<>();
     private MutableLiveData<String> budgetUsageText = new MutableLiveData<>();
     
+    // 添加总预算字段
+    private String totalBudget = "¥5,000.00";
+    private String usedBudget = "¥2,856.20";
+    
     public HomeViewModel() {
         // 初始化数据
         initData();
@@ -30,7 +34,8 @@ public class HomeViewModel extends ViewModel {
         remainingBudget.setValue("¥2,143.80");
         budgetProgress.setValue(57); // 57%进度
         budgetProgressColor.setValue(R.color.budget_sufficient);
-        budgetUsageText.setValue("已使用 57% 预算");
+        // 修改为"实际使用/总预算"格式
+        budgetUsageText.setValue(usedBudget + "/" + totalBudget);
     }
     
     public LiveData<String> getTodayExpense() { return todayExpense; }
@@ -38,7 +43,7 @@ public class HomeViewModel extends ViewModel {
     public LiveData<String> getMonthIncome() { return monthIncome; }
     public LiveData<String> getRemainingBudget() { return remainingBudget; }
     public LiveData<Integer> getBudgetProgress() { return budgetProgress; }
-    public int getBudgetProgressColor() { return budgetProgressColor.getValue(); }
+    public int getBudgetProgressColor() { return budgetProgressColor.getValue() != null ? budgetProgressColor.getValue() : R.color.budget_sufficient; }
     public LiveData<String> getBudgetUsageText() { return budgetUsageText; }
     
     // TODO: 添加业务逻辑方法

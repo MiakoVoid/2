@@ -1,7 +1,3 @@
----
-trigger: always_on
----
-
 -- 创建数据库并设置字符集
 CREATE DATABASE IF NOT EXISTS greenfinance DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE greenfinance;
@@ -82,9 +78,11 @@ CREATE TABLE `bill` (
 `remark` varchar(500) DEFAULT NULL COMMENT '备注信息',
 `bill_time` datetime NOT NULL COMMENT '收支发生时间',
 `payment_method` varchar(50) DEFAULT NULL COMMENT '支付方式（如"微信支付"）',
+`order_number` varchar(32) DEFAULT NULL COMMENT '订单号',
 `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
 `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',
 PRIMARY KEY (`id`),
+UNIQUE KEY `uk_order_number` (`order_number`),
 KEY `idx_user_time` (`user_id`,`bill_time`) COMMENT '按用户+时间查询账单',
 KEY `idx_user_category` (`user_id`,`category_id`,`sub_category_id`) COMMENT '按用户+分类查询账单',
 CONSTRAINT `fk_bill_category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),

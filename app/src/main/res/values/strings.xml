@@ -15,4 +15,10 @@
     <string name="title_profile">我的</string>
     <string name="add_bill">添加账单</string>
     <string name="confirm_password_hint">确认密码</string>
+    <string name="default_budget_text">暂无预算</string>
+    
+    <!-- 记账方式 -->
+    <string name="manual_billing">手动记账</string>
+    <string name="screenshot_billing">截图记账</string>
+    <string name="text_billing">文字记账</string>
 </resources>

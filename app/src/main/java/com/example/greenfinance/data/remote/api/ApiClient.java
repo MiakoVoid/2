@@ -20,7 +20,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * API客户端配置类
  */
 public class ApiClient {
-    private static final String BASE_URL = "http://10.0.2.2:8080/api/"; // 模拟器访问本地服务器的地址，必须以/结尾
+    private static final String BASE_URL = "http://192.168.0.102:8080/api/";
+//    private static final String BASE_URL = "http://10.0.2.2:8080/api/"; // 模拟器访问本地服务器的地址，必须以/结尾
     private static final String TAG = "ApiClient";
     private static Retrofit retrofit = null;
 
@@ -77,4 +78,11 @@ public class ApiClient {
         return getClient().create(AuthService.class);
     }
 
+    /**
+     * 获取分类服务接口
+     * @return CategoryService实例
+     */
+    public static CategoryService getCategoryService() {
+        return getClient().create(CategoryService.class);
+    }
 }

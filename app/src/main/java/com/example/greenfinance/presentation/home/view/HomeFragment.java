@@ -4,26 +4,21 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.greenfinance.R;
 import com.example.greenfinance.common.util.SecurePreferences;
 import com.example.greenfinance.data.model.Bill;
 import com.example.greenfinance.databinding.FragmentHomeBinding;
 import com.example.greenfinance.presentation.auth.view.LoginActivity;
-import com.example.greenfinance.presentation.home.adapter.BillAdapter;
+import com.example.greenfinance.presentation.home.adapter.HomeAdapter;
 import com.example.greenfinance.presentation.home.viewmodel.HomeViewModel;
 
 import java.math.BigDecimal;
@@ -33,11 +28,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements HomeAdapter.OnHeaderButtonClickListener {
 
     private FragmentHomeBinding binding;
-    private boolean isBatchMode = false;
     private HomeViewModel viewModel;
+    private HomeAdapter homeAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,47 +70,17 @@ public class HomeFragment extends Fragment {
         binding.setLifecycleOwner(getViewLifecycleOwner());
         binding.setViewModel(viewModel);
 
-        // 初始化账单适配器
-        initBillAdapter();
+        // 初始化适配器
+        initAdapter();
 
         // 初始化视图
         initViews();
 
         // 设置监听器
         setupListeners();
-
-        // 注册 MenuProvider
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.home_menu, menu);
-                setupMenuClickListeners(menu);
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                // 如果需要处理菜单项选择事件，可以在这里实现
-                return false;
-            }
-
-            @Override
-            public void onPrepareMenu(@NonNull Menu menu) {
-                MenuItem batchItem = menu.findItem(R.id.action_batch);
-                if (batchItem != null) {
-                    if (isBatchMode) {
-                        batchItem.setIcon(R.drawable.ic_check_box_outline);
-                        batchItem.setTitle("完成");
-                    } else {
-                        batchItem.setIcon(R.drawable.ic_check_box);
-                        batchItem.setTitle("批量处理");
-                    }
-                }
-            }
-        }, getViewLifecycleOwner());
     }
 
     private boolean isUserLoggedIn() {
-        // 检查是否有保存的token且未过期
         return SecurePreferences.getToken() == null || SecurePreferences.isTokenExpired();
     }
 
@@ -138,15 +103,25 @@ public class HomeFragment extends Fragment {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void initBillAdapter() {
-        BillAdapter billAdapter = new BillAdapter();
-        binding.rvRecentBills.setAdapter(billAdapter);
-        // 设置LayoutManager
-        binding.rvRecentBills.setLayoutManager(new LinearLayoutManager(requireContext()));
+    private void initAdapter() {
+        homeAdapter = new HomeAdapter(this);
+        binding.rvHomeContent.setAdapter(homeAdapter);
+        binding.rvHomeContent.setLayoutManager(new LinearLayoutManager(requireContext()));
+        
+        // 设置头部数据
+        HomeAdapter.HeaderData headerData = new HomeAdapter.HeaderData(
+                "¥25.50", 
+                "¥125.00", 
+                "¥800.00", 
+                30, 
+                requireContext().getColor(com.example.greenfinance.R.color.budget_sufficient),
+                "预算: ¥300.00/¥1000.00"
+        );
+        homeAdapter.setHeaderData(headerData);
 
-        // 添加示例数据
+        // 添加示例账单数据
         List<Bill> sampleBills = createSampleBills();
-        billAdapter.setBills(sampleBills);
+        homeAdapter.setBills(sampleBills);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -172,67 +147,16 @@ public class HomeFragment extends Fragment {
         LocalDateTime twoDaysAgo = now.minusDays(2);
         bills.add(new Bill(5, new BigDecimal("35.50"), "餐饮", "肯德基",
                 Date.from(twoDaysAgo.atZone(ZoneId.systemDefault()).toInstant())));
+        
+        // 添加更多示例数据以测试滚动和分组
+        for (int i = 6; i <= 30; i++) {
+            LocalDateTime billDate = now.minusDays(i % 7); // 在最近一周内分布
+            bills.add(new Bill(i, new BigDecimal(String.valueOf(i * 10 % 100 + 5)), 
+                    "餐饮", "餐厅" + i,
+                    Date.from(billDate.atZone(ZoneId.systemDefault()).toInstant())));
+        }
 
         return bills;
-    }
-
-    /**
-     * 切换批量处理模式
-     */
-    private void toggleBatchMode() {
-        isBatchMode = !isBatchMode;
-        // 更新UI以反映批量处理模式状态
-        if (isAdded()) {
-            requireActivity().invalidateOptionsMenu();
-        }
-    }
-
-    /**
-     * 为菜单项设置点击监听器
-     */
-    private void setupMenuClickListeners(Menu menu) {
-        // 搜索菜单项
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        if (searchItem != null) {
-            searchItem.setOnMenuItemClickListener(item -> {
-                // TODO: 实现搜索功能
-                // 例如：显示搜索对话框或跳转到搜索页面
-                showSearchDialog();
-                return true;
-            });
-        }
-
-        // 批量处理菜单项
-        MenuItem batchItem = menu.findItem(R.id.action_batch);
-        if (batchItem != null) {
-            batchItem.setOnMenuItemClickListener(item -> {
-                // 切换批量处理模式
-                toggleBatchMode();
-                return true;
-            });
-        }
-
-        // 添加其他菜单项的监听器...
-    }
-
-    /**
-     * 显示搜索对话框
-     */
-    private void showSearchDialog() {
-        // TODO: 实现搜索对话框
-        // 例如：显示一个包含搜索框的对话框
-        // 或者启动一个搜索Activity
-    }
-
-    /**
-     * 处理批量操作完成
-     */
-    private void completeBatchOperation() {
-        // TODO: 实现批量操作完成逻辑
-        isBatchMode = false;
-        if (isAdded()) {
-            requireActivity().invalidateOptionsMenu();
-        }
     }
 
     @Override
@@ -240,5 +164,11 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         // 清理绑定引用，防止内存泄漏
         binding = null;
+    }
+
+    @Override
+    public void onManageBudgetClick() {
+        // 处理管理预算按钮点击事件
+        // 在实际应用中，这里会导航到预算管理页面
     }
 }

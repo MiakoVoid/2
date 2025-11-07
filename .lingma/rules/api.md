@@ -2,17 +2,597 @@
 trigger: always_on
 ---
 
-
 # 绿芽记账（greenfinance）接口文档
+输入使用统一实体类bo类，返回实体类vo类,数据库操作使用实体类。
 ## 一、基础元信息
 | 字段     | 取值                                                                  | 说明                                                                 |
 |--------|---------------------------------------------------------------------|--------------------------------------------------------------------|
 | 项目名    | greenfinance（绿芽记账）                                                  | 个人财务管理安卓应用                                                         |
 | 文档版本   | V1.0                                                                | 接口定义稳定版                                                            |
 | 基础URL  | 生产：暂定；开发：`http://localhost:8080/api`                                | 接口请求根路径                                                            |
-| 认证方式   | JWT Token，请求头携带 `Authorization: Bearer {token}`                     | 除“注册/登录”外所有接口必传                                                    |
+| 认证方式   | JWT Token，请求头携带 `Authorization: Bearer {token}`                     | 除"注册/登录"外所有接口必传                                                    |
 | 统一响应格式 | JSON结构，包含`success`（布尔）、`code`（整数）、`message`（字符串）、`data`（对象/数组/Null） | 成功时`success=true`，失败时返回错误原因                                        |
-| 核心存储特性 | 图片（头像/分类图标）存储于安卓本地，数据库存“相对路径/资源标识”                                  | 如“file:files/greenfinance/avatars/10001.png”“res:ic_category_food” |
+| 核心存储特性 | 图片（头像/分类图标）存储于安卓本地，数据库存"相对路径/资源标识"                                  | 如"file:files/greenfinance/avatars/10001.png""res:ic_category_food" |
+
+## 二、用户认证模块（Auth Module）
+
+### 1. 用户注册
+- **接口标识**：地址=`/auth/register`，方法=POST
+- 描述：注册账号，只需要username和password,暂时不考虑email和phone的验证功能。密码6-20位，含字母+数字,可以有特殊符号。
+- **请求参数（JSON）**：
+  | 参数名     | 类型   | 必传 | 说明                          | 示例值               |
+  |------------|--------|------|-------------------------------|----------------------|
+  | username   | String | 是   | 3-20位，含字母/数字/下划线    | "zhangsan123"        |
+  | password   | String | 是   | 6-20位，含字母+数字           | "Zhang@123456"       |
+  | email      | String | 否   | 符合邮箱格式                   | "zhangsan@xxx.com"   |
+  | phone      | String | 否   | 11位数字                      | "13800138000"        |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "注册成功",
+    "data": {
+      "userId": 10001,
+      "username": "zhangsan123",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
+  }
+  ```
+
+
+### 2. 用户登录
+- **接口标识**：地址=`/auth/login`，方法=POST
+- 描述：暂时只支持用户名+密码登录。
+- **请求参数（JSON）**：
+  | 参数名     | 类型   | 必传 | 说明                          | 示例值               |
+  |------------|--------|------|-------------------------------|----------------------|
+  | username   | String | 是   | 用户名                        | "zhangsan123"        |
+  | password   | String | 是   | 登录密码                      | "Zhang@123456"       |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "登录成功",
+    "data": {
+      "userId": 10001,
+      "username": "zhangsan123",
+      "avatarPath": "files/greenfinance/avatars/10001.png",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
+  }
+  ```
+
+
+### 3. 用户登出
+- **接口标识**：地址=`/auth/logout`，方法=POST
+- **请求参数**：仅需请求头`Authorization: Bearer {token}`
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "登出成功",
+    "data": null
+  }
+  ```
+## 三、用户信息模块（User Profile Module）
+### 1. 获取用户信息
+- **接口标识**：地址=`/user/profile`，方法=GET
+- **请求参数**：请求头`Authorization: Bearer {token}`
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "success",
+    "data": {
+      "userId": 10001,
+      "username": "zhangsan123",
+      "email": "zhangsan@xxx.com",
+      "phone": "13800138000",
+      "avatarPath": "files/greenfinance/avatars/10001_1698000000.png",
+      "createTime": "2023-10-23 14:30:00"
+    }
+  }
+  ```
+
+### 2. 更新用户信息
+- **接口标识**：地址=`/user/profile`，方法=PUT
+- **请求参数（JSON）**：
+  | 参数名       | 类型   | 必传 | 说明                          | 示例值               |
+  |--------------|--------|------|-------------------------------|----------------------|
+  | email        | String | 否   | 新邮箱，需唯一且符合格式      | "new_zhangsan@xxx.com"|
+  | phone        | String | 否   | 新手机号，11位数字            | "13900139000"        |
+  | avatarPath   | String | 否   | 新头像本地相对路径（前端先存图）| "files/greenfinance/avatars/10001_1698100000.png" |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "用户信息更新成功",
+    "data": null
+  }
+  ```
+
+### 3. 修改密码
+- **接口标识**：地址=`/user/password`，方法=PUT
+- **请求参数（JSON）**：
+  | 参数名       | 类型   | 必传 | 说明                          | 示例值               |
+  |--------------|--------|------|-------------------------------|----------------------|
+  | oldPassword  | String | 是   | 原密码                        | "Zhang@123456"       |
+  | newPassword  | String | 是   | 新密码，6-20位含字母+数字     | "Zhang@654321"       |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "密码修改成功，请重新登录",
+    "data": null
+  }
+  ```
+
+
+## 四、分类管理模块（Category Module）
+## 三、分类管理模块（Category Module）
+
+### 1. 获取所有分类（含子分类）
+- **接口标识**：地址=`/categories`，方法=GET
+- **请求参数**：请求头`Authorization: Bearer {token}`，查询参数[type](file://D:\DevelopmentTool\JavaProgarm\greenfinance\src\main\java\com\it\greenfinance\pojo\Bill.java#L54-L54)（可选，1=支出，2=收入）
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "id": 1,
+        "name": "餐饮",
+        "iconIdentifier": "res:ic_category_food",
+        "type": 1,
+        "sortOrder": 1,
+        "subCategories": [
+          {
+            "id": 1,
+            "categoryId": 1,
+            "name": "快餐",
+            "iconIdentifier": null,
+            "sortOrder": 1
+          },
+          {
+            "id": 2,
+            "categoryId": 1,
+            "name": "奶茶",
+            "iconIdentifier": "file:files/greenfinance/icons/milk_tea.png",
+            "sortOrder": 2
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+
+### 2. 创建主分类
+- **接口标识**：地址=`/categories`，方法=POST
+- **请求参数（JSON）**：
+  | 参数名         | 类型   | 必传 | 说明                          | 示例值               |
+  |----------------|--------|------|-------------------------------|----------------------|
+  | name           | String | 是   | 主分类名称，唯一              | "数码"               |
+  | iconIdentifier | String | 是   | 图标标识（res:资源名/file:本地路径）| "res:ic_category_digital" |
+  | type           | Integer| 是   | 1=支出，2=收入                | 1                    |
+  | sortOrder      | Integer| 否   | 排序序号，默认0               | 3                    |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "主分类创建成功",
+    "data": {
+      "id": 9,
+      "name": "数码",
+      "iconIdentifier": "res:ic_category_digital",
+      "type": 1,
+      "sortOrder": 0
+    }
+  }
+  ```
+
+
+### 3. 更新主分类
+- **接口标识**：地址=`/categories/{id}`，方法=PUT
+- **请求参数（JSON）**：
+  | 参数名         | 类型   | 必传 | 说明                          | 示例值               |
+  |----------------|--------|------|-------------------------------|----------------------|
+  | name           | String | 否   | 主分类名称，唯一              | "数码"               |
+  | iconIdentifier | String | 否   | 图标标识（res:资源名/file:本地路径）| "res:ic_category_digital" |
+  | type           | Integer| 否   | 1=支出，2=收入                | 1                    |
+  | sortOrder      | Integer| 否   | 排序序号，默认0               | 3                    |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "分类更新成功",
+    "data": {
+      "id": 9,
+      "name": "数码",
+      "iconIdentifier": "res:ic_category_digital",
+      "type": 1,
+      "sortOrder": 3
+    }
+  }
+  ```
+
+
+### 4. 删除主分类
+- **接口标识**：地址=`/categories/{id}`，方法=DELETE
+- **请求参数**：路径参数[id](file://D:\DevelopmentTool\JavaProgarm\greenfinance\src\main\java\com\it\greenfinance\pojo\User.java#L26-L27)（主分类ID）
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "分类删除成功",
+    "data": null
+  }
+  ```
+  ```
+
+### 8. 分类关键词管理（AI识别用）
+- **接口标识**：地址=`/category-keywords`，方法=POST（新增）/GET（查询）/DELETE（删除）
+- **新增关键词请求参数（JSON）**：
+  | 参数名         | 类型   | 必传 | 说明                          | 示例值               |
+  |----------------|--------|------|-------------------------------|----------------------|
+  | categoryId     | Long   | 是   | 主分类ID                      | 1                    |
+  | subCategoryId  | Long   | 否   | 子分类ID，可为null            | 1                    |
+  | keyword        | String | 是   | 关键词（如商户名）            | "麦当劳"             |
+- **响应示例（新增）**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "关键词添加成功",
+    "data": {
+      "id": 101,
+      "keyword": "麦当劳",
+      "categoryId": 1,
+      "subCategoryId": 1
+    }
+  }
+  ```
+
+## 四、子分类管理模块（SubCategory Module）
+
+### 1. 获取指定分类下的所有子分类
+- **接口标识**：地址=`/sub-categories`，方法=GET
+- **请求参数**：请求头`Authorization: Bearer {token}`，查询参数`categoryId`（主分类ID）
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "id": 1,
+        "categoryId": 1,
+        "name": "快餐",
+        "iconIdentifier": null,
+        "sortOrder": 1
+      },
+      {
+        "id": 2,
+        "categoryId": 1,
+        "name": "奶茶",
+        "iconIdentifier": "file:files/greenfinance/icons/milk_tea.png",
+        "sortOrder": 2
+      }
+    ]
+  }
+  ```
+
+
+### 2. 创建子分类
+- **接口标识**：地址=`/sub-categories`，方法=POST
+- **请求参数（JSON）**：
+  | 参数名         | 类型   | 必传 | 说明                          | 示例值               |
+  |----------------|--------|------|-------------------------------|----------------------|
+  | categoryId     | Long   | 是   | 关联主分类ID                  | 9                    |
+  | name           | String | 是   | 子分类名称，同一主分类下唯一  | "手机配件"           |
+  | iconIdentifier | String | 否   | 图标标识，空则继承主分类      | "file:files/greenfinance/icons/phone_part.png" |
+  | sortOrder      | Integer| 否   | 排序序号，默认0               | 1                    |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "子分类创建成功",
+    "data": {
+      "id": 21,
+      "categoryId": 9,
+      "name": "手机配件",
+      "iconIdentifier": "file:files/greenfinance/icons/phone_part.png",
+      "sortOrder": 1
+    }
+  }
+  ```
+
+
+### 3. 更新子分类
+- **接口标识**：地址=`/sub-categories/{id}`，方法=PUT
+- **请求参数（JSON）**：
+  | 参数名         | 类型   | 必传 | 说明                          | 示例值               |
+  |----------------|--------|------|-------------------------------|----------------------|
+  | categoryId     | Long   | 否   | 关联主分类ID                  | 9                    |
+  | name           | String | 否   | 子分类名称，同一主分类下唯一  | "手机配件"           |
+  | iconIdentifier | String | 否   | 图标标识，空则继承主分类      | "file:files/greenfinance/icons/phone_part.png" |
+  | sortOrder      | Integer| 否   | 排序序号，默认0               | 1                    |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "子分类更新成功",
+    "data": {
+      "id": 21,
+      "categoryId": 9,
+      "name": "手机配件",
+      "iconIdentifier": "file:files/greenfinance/icons/phone_part.png",
+      "sortOrder": 1
+    }
+  }
+  ```
+
+
+### 4. 删除子分类
+- **接口标识**：地址=`/sub-categories/{id}`，方法=DELETE
+- **请求参数**：路径参数[id](file://D:\DevelopmentTool\JavaProgarm\greenfinance\src\main\java\com\it\greenfinance\pojo\User.java#L26-L27)（子分类ID）
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "子分类删除成功",
+    "data": null
+  }
+  ```
+
+
+## 五、账单管理模块（Bill Module）
+
+### 1. 创建账单
+- **接口标识**：地址=`/bills/add`，方法=POST
+- **请求参数（JSON）**：
+  | 参数名            | 类型         | 必传 | 说明                         | 示例值                   |
+  |----------------|------------|----|----------------------------|-----------------------|
+  | originalAmount | BigDecimal | 是  | 原始金额（正数）                   | 50.00                 |
+  | refundAmount   | BigDecimal | 否  | 退款金额，默认0，不超原始金额            | 10.00                 |
+  | type           | Integer    | 是  | 1=支出，2=收入                  | 1                     |
+  | categoryId     | Long       | 是  | 主分类ID（需存在且归属当前用户）          | 1                     |
+  | subCategoryId  | Long       | 否  | 子分类ID，可为null（若传则需归属对应主分类）  | 1                     |
+  | merchant       | String     | 否  | 商户名称（最长100字符）              | "麦当劳（科技园店）"           |
+  | remark         | String     | 否  | 备注（最多500字符）                | "早餐：汉堡+可乐"            |
+  | billTime       | String     | 是  | 账单时间，格式yyyy-MM-dd HH:mm:ss | "2023-10-25 08:30:00" |
+  | paymentMethod  | String     | 否  | 支付方式（最长50字符）               | "微信支付"                |
+  | orderNumber    | String     | 否  | 订单号（最长32字符）               | "202310250830001"         |
+
+- **响应示例**：
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "账单创建成功",
+  "data": {
+    "id": 10001,
+    "userId": 10001,
+    "amount": 40.00,
+    "originalAmount": 50.00,
+    "refundAmount": 10.00,
+    "type": 1,
+    "categoryId": 1,
+    "categoryName": "餐饮",
+    "subCategoryId": 1,
+    "subCategoryName": "快餐",
+    "merchant": "麦当劳（科技园店）",
+    "remark": "早餐：汉堡+可乐",
+    "billTime": "2023-10-25 08:30:00",
+    "paymentMethod": "微信支付",
+    "orderNumber": "202310250830001",
+    "createTime": "2023-10-25 08:35:00",
+    "updateTime": "2023-10-25 08:35:00"
+  }
+}
+```
+
+
+### 2. 获取账单列表
+- **接口标识**：地址=`/bills/list`，方法=GET
+  - **请求参数**：
+    | 参数名        | 类型      | 必传 | 说明                             | 示例值          |
+    |------------|---------|----|--------------------------------|--------------|
+    | page       | Integer | 否  | 页码，默认1                         | 1            |
+    | size       | Integer | 否  | 每页条数，默认20                      | 20           |
+    | startTime  | String  | 否  | 开始日期（格式yyyy-MM-dd） | "2023-10-01" |
+    | endTime    | String  | 否  | 结束日期（格式yyyy-MM-dd） | "2023-10-31" |
+    | categoryId | Long    | 否  | 主分类ID（筛选对应分类的账单）               | 1            |
+    | merchant   | String  | 否  | 商户名称（筛选对应商户的账单）模糊查询                 | "麦当劳（科技园店）" |
+    | type       | Integer | 否  | 1=支出，2=收入（筛选对应类型的账单）           | 1            |
+  -
+
+- **响应示例**：
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": {
+    "records": [
+      {
+        "id": 10001,
+        "userId": 10001,
+        "amount": 40.00,
+        "originalAmount": 50.00,
+        "refundAmount": 10.00,
+        "type": 1,
+        "categoryId": 1,
+        "categoryName": "餐饮",
+        "subCategoryId": 1,
+        "subCategoryName": "快餐",
+        "merchant": "麦当劳（科技园店）",
+        "remark": "早餐：汉堡+可乐",
+        "billTime": "2023-10-25 08:30:00",
+        "paymentMethod": "微信支付",
+        "createTime": "2023-10-25 08:35:00",
+        "updateTime": "2023-10-25 08:35:00"
+      }
+    ],
+    "total": 1,
+    "size": 20,
+    "current": 1,
+    "pages": 1
+  }
+}
+```
+
+
+### 3. 获取账单详情
+- **接口标识**：地址=`/bills/{id}`，方法=GET
+- **请求参数**：路径参数[id](file://D:\DevelopmentTool\JavaProgarm\greenfinance\src\main\java\com\it\greenfinance\pojo\User.java#L26-L27)（账单ID）
+- **响应示例**：
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": 10001,
+    "userId": 10001,
+    "amount": 40.00,
+    "originalAmount": 50.00,
+    "refundAmount": 10.00,
+    "type": 1,
+    "categoryId": 1,
+    "categoryName": "餐饮",
+    "subCategoryId": 1,
+    "subCategoryName": "快餐",
+    "merchant": "麦当劳（科技园店）",
+    "remark": "早餐：汉堡+可乐",
+    "billTime": "2023-10-25 08:30:00",
+    "paymentMethod": "微信支付",
+    "createTime": "2023-10-25 08:35:00",
+    "updateTime": "2023-10-25 08:35:00"
+  }
+}
+```
+
+
+### 4. 更新账单
+- **接口标识**：地址=`/bills/{id}`，方法=PUT
+- **请求参数**：
+  - 路径参数：[id](file://D:\DevelopmentTool\JavaProgarm\greenfinance\src\main\java\com\it\greenfinance\pojo\User.java#L26-L27)（账单ID）
+  - 请求体（JSON，参数规则同"创建账单"，所有参数非必传，仅传需修改的字段）
+
+- **响应示例**：
+  ``json
+  {
+  "success": true,
+  "code": 200,
+  "message": "账单更新成功",
+  "data": {
+  "id": 10001,
+  "userId": 10001,
+  "amount": 40.00,
+  "originalAmount": 50.00,
+  "refundAmount": 10.00,
+  "type": 1,
+  "categoryId": 1,
+  "categoryName": "餐饮",
+  "subCategoryId": 1,
+  "subCategoryName": "快餐",
+  "merchant": "麦当劳（科技园店）",
+  "remark": "早餐：汉堡+可乐",
+  "billTime": "2023-10-25 08:30:00",
+  "paymentMethod": "微信支付",
+  "orderNumber": "202310250830001",
+  "createTime": "2023-10-25 08:35:00",
+  "updateTime": "2023-10-25 08:35:00"
+  }
+  }
+```
+
+
+### 5. 删除账单
+- **接口标识**：地址=`/bills/{id}`，方法=DELETE
+- **请求参数**：路径参数[id](file://D:\DevelopmentTool\JavaProgarm\greenfinance\src\main\java\com\it\greenfinance\pojo\User.java#L26-L27)（账单ID）
+- **响应示例**：
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "账单删除成功",
+  "data": null
+}
+```
+
+
+
+
+## 六、智能记账模块（AI Billing Module）
+### 1. OCR文本解析（截图记账）
+- **接口标识**：地址=`/ai/ocr-parse`，方法=POST
+- **请求参数（JSON）**：
+  | 参数名       | 类型   | 必传 | 说明                          | 示例值               |
+  |--------------|--------|------|-------------------------------|----------------------|
+  | ocrText      | String | 是   | Google ML Kit识别的文本内容   | "微信支付 收款方：喜茶(科技园店) 金额：¥35.50 时间：2023-10-25 14:30:00" |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "OCR解析成功",
+    "data": {
+      "amount": 35.50,
+      "type": 1,
+      "categoryId": 1,
+      "categoryName": "餐饮",
+      "subCategoryId": 2,
+      "subCategoryName": "奶茶",
+      "merchant": "喜茶(科技园店)",
+      "billTime": "2023-10-25 14:30:00",
+      "paymentMethod": "微信支付"
+    }
+  }
+  ```
+
+### 2. 文本描述解析（文本记账）
+- **接口标识**：地址=`/ai/text-parse`，方法=POST
+- **请求参数（JSON）**：
+  | 参数名       | 类型   | 必传 | 说明                          | 示例值               |
+  |--------------|--------|------|-------------------------------|----------------------|
+  | text         | String | 是   | 用户输入的自然语言描述        | "今天下午2点半在肯德基花了45元吃炸鸡" |
+- **响应示例**：
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "文本解析成功",
+    "data": {
+      "amount": 45.00,
+      "type": 1,
+      "categoryId": 1,
+      "categoryName": "餐饮",
+      "subCategoryId": 1,
+      "subCategoryName": "快餐",
+      "merchant": "肯德基",
+      "billTime": "2023-10-25 14:30:00"
+    }
+  }
+  ```
+
+
 ## 七、错误码与补充说明
 ### 1. 核心错误码
 | 错误码 | 含义              | 示例场景             |
@@ -25,1385 +605,5 @@ trigger: always_on
 | 500 | 服务端异常           | AI接口调用失败         |
 
 ### 2. 本地图片处理规则
-- 前端通过`context.getFilesDir()` + 数据库存储的“相对路径”获取图片绝对路径（如`/data/user/0/com.example.greenfinance/files/greenfinance/avatars/10001.png`）
+- 前端通过`context.getFilesDir()` + 数据库存储的"相对路径"获取图片绝对路径（如`/data/user/0/com.example.greenfinance/files/greenfinance/avatars/10001.png`）
 - 系统图标通过`R.drawable.资源名`加载（如`res:ic_category_food`对应`R.drawable.ic_category_food`）
-
-
-
----
-title: 默认模块
-language_tabs:
-- shell: Shell
-- http: HTTP
-- javascript: JavaScript
-- ruby: Ruby
-- python: Python
-- php: PHP
-- java: Java
-- go: Go
-  toc_footers: []
-  includes: []
-  search: true
-  code_clipboard: true
-  highlight_theme: darkula
-  headingLevel: 2
-  generator: "@tarslib/widdershins v4.0.30"
-
----
-
-# 默认模块
-
-Base URLs:
-
-# Authentication
-
-- HTTP Authentication, scheme: bearer
-
-# 账单控制器
-
-## POST 创建账单
-
-POST /bills/add
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "originalAmount": 0,
-  "refundAmount": 0,
-  "type": 0,
-  "categoryId": 0,
-  "subCategoryId": 0,
-  "merchant": "string",
-  "remark": "string",
-  "billTime": "string",
-  "paymentMethod": "string",
-  "startTime": "string",
-  "endTime": "string"
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[BillBo](#schemabillbo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## GET 获取账单列表
-
-GET /bills/list
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|page|query|integer| 是 |页码|
-|size|query|integer| 是 |每页数量|
-|id|query|integer(int64)| 否 |账单ID|
-|originalAmount|query|string| 否 |原始金额|
-|refundAmount|query|string| 否 |退款金额|
-|type|query|integer| 否 |类型：1-支出，2-收入|
-|categoryId|query|integer(int64)| 否 |主分类ID（需存在且归属当前用户）|
-|subCategoryId|query|integer(int64)| 否 |子分类ID，可为null（若传则需归属对应主分类）|
-|merchant|query|string| 否 |商户名称（最长100字符）|
-|remark|query|string| 否 |备注（最多500字符）|
-|billTime|query|string| 否 |账单时间，格式yyyy-MM-dd HH:mm:ss|
-|paymentMethod|query|string| 否 |支付方式（最长50字符）|
-|startTime|query|string| 否 |起止时间|
-|endTime|query|string| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## GET 获取账单详情
-
-GET /bills/{id}
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|id|path|integer| 是 |账单ID|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## DELETE 删除账单
-
-DELETE /bills/{id}
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|id|path|integer| 是 |账单ID|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## PUT 更新账单
-
-PUT /bills/update
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "originalAmount": 0,
-  "refundAmount": 0,
-  "type": 0,
-  "categoryId": 0,
-  "subCategoryId": 0,
-  "merchant": "string",
-  "remark": "string",
-  "billTime": "string",
-  "paymentMethod": "string",
-  "startTime": "string",
-  "endTime": "string"
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[BillBo](#schemabillbo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-# 用户登录控制器
-
-## POST 登录
-
-POST /auth/login
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "username": "string",
-  "password": "string",
-  "email": "string",
-  "phone": "string",
-  "avatarPath": "string",
-  "status": 0,
-  "createTime": "string",
-  "updateTime": "string"
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[UserBo](#schemauserbo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## POST 注册
-
-POST /auth/register
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "username": "string",
-  "password": "string",
-  "email": "string",
-  "phone": "string",
-  "avatarPath": "string",
-  "status": 0,
-  "createTime": "string",
-  "updateTime": "string"
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[UserBo](#schemauserbo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## POST 登出
-
-POST /auth/logout
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-# 子分类控制器
-
-## GET 获取指定分类下的所有子分类
-
-GET /sub-categories
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|categoryId|query|integer| 是 |分类ID|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## POST 创建子分类
-
-POST /sub-categories
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "categoryId": 0,
-  "name": "string",
-  "iconIdentifier": "string",
-  "sortOrder": 0
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[SubCategoryBo](#schemasubcategorybo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## PUT 更新子分类
-
-PUT /sub-categories/update
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "categoryId": 0,
-  "name": "string",
-  "iconIdentifier": "string",
-  "sortOrder": 0
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[SubCategoryBo](#schemasubcategorybo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## DELETE 删除子分类（只有用户自己的子分类才能删除）
-
-DELETE /sub-categories/{id}
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|id|path|integer| 是 |子分类ID|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-# 分类控制器
-
-## GET 获取所有分类（支持按类型筛选）
-
-GET /categories
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|type|query|integer| 否 |分类类型（可选，1=支出，2=收入）|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## POST 创建主分类
-
-POST /categories
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "name": "string",
-  "iconIdentifier": "string",
-  "type": 0,
-  "sortOrder": 0
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[CategoryBo](#schemacategorybo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## PUT 更新主分类
-
-PUT /categories/update
-
-> Body 请求参数
-
-```json
-{
-  "id": 0,
-  "name": "string",
-  "iconIdentifier": "string",
-  "type": 0,
-  "sortOrder": 0
-}
-```
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|body|body|[CategoryBo](#schemacategorybo)| 否 |none|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-## DELETE 删除主分类（只有用户自己的分类才能删除）
-
-DELETE /categories/{id}
-
-### 请求参数
-
-|名称|位置|类型|必选|说明|
-|---|---|---|---|---|
-|id|path|integer| 是 |分类ID|
-
-> 返回示例
-
-> 200 Response
-
-```json
-{
-  "success": false,
-  "code": 0,
-  "message": "",
-  "data": {}
-}
-```
-
-### 返回结果
-
-|状态码|状态码含义|说明|数据模型|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[Result](#schemaresult)|
-
-# 数据模型
-
-<h2 id="tocS_CommonResponse">CommonResponse</h2>
-
-<a id="schemacommonresponse"></a>
-<a id="schema_CommonResponse"></a>
-<a id="tocScommonresponse"></a>
-<a id="tocscommonresponse"></a>
-
-```json
-{
-  "code": 200,
-  "message": "操作成功",
-  "data": {}
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|code|integer|false|none||状态码（200=成功，4xx=客户端错误，5xx=服务端错误）|
-|message|string|false|none||操作描述信息|
-|data|object|false|none||业务数据（成功时返回）|
-
-<h2 id="tocS_LoginRequest">LoginRequest</h2>
-
-<a id="schemaloginrequest"></a>
-<a id="schema_LoginRequest"></a>
-<a id="tocSloginrequest"></a>
-<a id="tocsloginrequest"></a>
-
-```json
-{
-  "loginId": "test_user",
-  "password": "Test123456",
-  "rememberMe": false
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|loginId|string|true|none||登录标识（用户名/邮箱/手机号）|
-|password|string|true|none||密码（6-20位，含字母和数字）|
-|rememberMe|boolean|false|none||是否记住登录（true=7天有效期）|
-
-<h2 id="tocS_RegisterRequest">RegisterRequest</h2>
-
-<a id="schemaregisterrequest"></a>
-<a id="schema_RegisterRequest"></a>
-<a id="tocSregisterrequest"></a>
-<a id="tocsregisterrequest"></a>
-
-```json
-{
-  "username": "new_user",
-  "password": "Test123456",
-  "email": "new_user@example.com",
-  "phone": 13800138000
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|username|string|true|none||用户名（3-20位，字母/数字/下划线）|
-|password|string|true|none||密码（6-20位，含字母和数字）|
-|email|string(email)|false|none||邮箱（可选）|
-|phone|string|false|none||手机号（可选，11位数字）|
-
-<h2 id="tocS_UserInfoResponse">UserInfoResponse</h2>
-
-<a id="schemauserinforesponse"></a>
-<a id="schema_UserInfoResponse"></a>
-<a id="tocSuserinforesponse"></a>
-<a id="tocsuserinforesponse"></a>
-
-```json
-{
-  "userId": 123,
-  "username": "test_user",
-  "email": "test@example.com",
-  "phone": 13800138000,
-  "avatarFileId": 456,
-  "defaultBudget": 5000,
-  "themeMode": 1
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|userId|integer|false|none||none|
-|username|string|false|none||none|
-|email|string|false|none||none|
-|phone|string|false|none||none|
-|avatarFileId|integer|false|none||none|
-|defaultBudget|number(float)|false|none||none|
-|themeMode|integer|false|none||0=跟随系统，1=浅色，2=深色|
-
-#### 枚举值
-
-|属性|值|
-|---|---|
-|themeMode|0|
-|themeMode|1|
-|themeMode|2|
-
-<h2 id="tocS_UpdateUserRequest">UpdateUserRequest</h2>
-
-<a id="schemaupdateuserrequest"></a>
-<a id="schema_UpdateUserRequest"></a>
-<a id="tocSupdateuserrequest"></a>
-<a id="tocsupdateuserrequest"></a>
-
-```json
-{
-  "email": "updated@example.com",
-  "phone": 13900139000,
-  "defaultBudget": 6000,
-  "themeMode": 1
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|email|string(email)|false|none||none|
-|phone|string|false|none||none|
-|defaultBudget|number(float)|false|none||none|
-|themeMode|integer|false|none||none|
-
-#### 枚举值
-
-|属性|值|
-|---|---|
-|themeMode|0|
-|themeMode|1|
-|themeMode|2|
-
-<h2 id="tocS_FileUploadResponse">FileUploadResponse</h2>
-
-<a id="schemafileuploadresponse"></a>
-<a id="schema_FileUploadResponse"></a>
-<a id="tocSfileuploadresponse"></a>
-<a id="tocsfileuploadresponse"></a>
-
-```json
-{
-  "fileId": 789,
-  "filePath": "/app/files/123/avatar.jpg",
-  "fileSize": 102400
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|fileId|integer|false|none||none|
-|filePath|string|false|none||none|
-|fileSize|integer|false|none||文件大小（字节）|
-
-<h2 id="tocS_BillRequest">BillRequest</h2>
-
-<a id="schemabillrequest"></a>
-<a id="schema_BillRequest"></a>
-<a id="tocSbillrequest"></a>
-<a id="tocsbillrequest"></a>
-
-```json
-{
-  "categoryId": 5,
-  "amount": 50,
-  "type": 2,
-  "billTime": "2025-10-23T12:30:00.000Z",
-  "remark": "午餐",
-  "location": "XX餐厅",
-  "receiptFileId": 1011
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|categoryId|integer|true|none||分类ID（需属于当前用户或系统默认）|
-|amount|number(float)|true|none||金额（>0，type区分收支）|
-|type|integer|true|none||1=收入，2=支出|
-|billTime|string(date-time)|true|none||账单时间（yyyy-MM-dd HH:mm:ss）|
-|remark|string|false|none||none|
-|location|string|false|none||none|
-|receiptFileId|integer|false|none||none|
-
-#### 枚举值
-
-|属性|值|
-|---|---|
-|type|1|
-|type|2|
-
-<h2 id="tocS_BillPageResponse">BillPageResponse</h2>
-
-<a id="schemabillpageresponse"></a>
-<a id="schema_BillPageResponse"></a>
-<a id="tocSbillpageresponse"></a>
-<a id="tocsbillpageresponse"></a>
-
-```json
-{
-  "total": 120,
-  "pageNum": 1,
-  "pageSize": 10,
-  "list": [
-    {
-      "billId": 2023,
-      "amount": 50,
-      "type": 2,
-      "typeName": "支出",
-      "categoryName": "餐饮美食",
-      "billTime": "2025-10-23T12:30:00.000Z"
-    }
-  ]
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|total|integer|false|none||总记录数|
-|pageNum|integer|false|none||none|
-|pageSize|integer|false|none||none|
-|list|[object]|false|none||none|
-|» billId|integer|false|none||none|
-|» amount|number(float)|false|none||none|
-|» type|integer|false|none||none|
-|» typeName|string|false|none||none|
-|» categoryName|string|false|none||none|
-|» billTime|string(date-time)|false|none||none|
-
-<h2 id="tocS_CategoryItem">CategoryItem</h2>
-
-<a id="schemacategoryitem"></a>
-<a id="schema_CategoryItem"></a>
-<a id="tocScategoryitem"></a>
-<a id="tocscategoryitem"></a>
-
-```json
-{
-  "categoryId": 5,
-  "name": "餐饮美食",
-  "type": 2,
-  "typeName": "支出",
-  "icon": "local_cafe",
-  "color": null,
-  "isDefault": 1
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|categoryId|integer|false|none||none|
-|name|string|false|none||none|
-|type|integer|false|none||none|
-|typeName|string|false|none||none|
-|icon|string|false|none||none|
-|color|string|false|none||none|
-|isDefault|integer|false|none||1=系统默认，0=自定义|
-
-#### 枚举值
-
-|属性|值|
-|---|---|
-|type|1|
-|type|2|
-|isDefault|0|
-|isDefault|1|
-
-<h2 id="tocS_AddCategoryRequest">AddCategoryRequest</h2>
-
-<a id="schemaaddcategoryrequest"></a>
-<a id="schema_AddCategoryRequest"></a>
-<a id="tocSaddcategoryrequest"></a>
-<a id="tocsaddcategoryrequest"></a>
-
-```json
-{
-  "name": "健身",
-  "type": 2,
-  "icon": "fitness_center",
-  "color": null
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|name|string|true|none||none|
-|type|integer|true|none||none|
-|icon|string|false|none||none|
-|color|string|false|none||none|
-
-#### 枚举值
-
-|属性|值|
-|---|---|
-|type|1|
-|type|2|
-
-<h2 id="tocS_CategoryKeywordRequest">CategoryKeywordRequest</h2>
-
-<a id="schemacategorykeywordrequest"></a>
-<a id="schema_CategoryKeywordRequest"></a>
-<a id="tocScategorykeywordrequest"></a>
-<a id="tocscategorykeywordrequest"></a>
-
-```json
-{
-  "keyword": "健身房",
-  "weight": 5
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|keyword|string|true|none||none|
-|weight|integer|false|none||none|
-
-<h2 id="tocS_BudgetResponse">BudgetResponse</h2>
-
-<a id="schemabudgetresponse"></a>
-<a id="schema_BudgetResponse"></a>
-<a id="tocSbudgetresponse"></a>
-<a id="tocsbudgetresponse"></a>
-
-```json
-{
-  "budgetId": 50,
-  "year": 2025,
-  "month": 10,
-  "totalBudget": 6000,
-  "usedAmount": 2350.5,
-  "remainingAmount": 3649.5,
-  "usageRate": 39.18
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|budgetId|integer|false|none||none|
-|year|integer|false|none||none|
-|month|integer|false|none||none|
-|totalBudget|number(float)|false|none||none|
-|usedAmount|number(float)|false|none||none|
-|remainingAmount|number(float)|false|none||none|
-|usageRate|number(float)|false|none||使用比例（%）|
-
-<h2 id="tocS_SetBudgetRequest">SetBudgetRequest</h2>
-
-<a id="schemasetbudgetrequest"></a>
-<a id="schema_SetBudgetRequest"></a>
-<a id="tocSsetbudgetrequest"></a>
-<a id="tocssetbudgetrequest"></a>
-
-```json
-{
-  "year": 2025,
-  "month": 11,
-  "totalBudget": 6500
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|year|integer|true|none||none|
-|month|integer|true|none||none|
-|totalBudget|number(float)|true|none||none|
-
-<h2 id="tocS_ExpectedExpenseRequest">ExpectedExpenseRequest</h2>
-
-<a id="schemaexpectedexpenserequest"></a>
-<a id="schema_ExpectedExpenseRequest"></a>
-<a id="tocSexpectedexpenserequest"></a>
-<a id="tocsexpectedexpenserequest"></a>
-
-```json
-{
-  "categoryId": 8,
-  "amount": 3000,
-  "planDate": "2025-11-05T00:00:00.000Z",
-  "title": "11月房租",
-  "description": "XX小区3号楼501房租"
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|categoryId|integer|true|none||none|
-|amount|number(float)|true|none||none|
-|planDate|string(date)|true|none||none|
-|title|string|true|none||none|
-|description|string|false|none||none|
-
-<h2 id="tocS_ImportResult">ImportResult</h2>
-
-<a id="schemaimportresult"></a>
-<a id="schema_ImportResult"></a>
-<a id="tocSimportresult"></a>
-<a id="tocsimportresult"></a>
-
-```json
-{
-  "transferId": 15,
-  "successCount": 25,
-  "failCount": 0
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|transferId|integer|false|none||none|
-|successCount|integer|false|none||none|
-|failCount|integer|false|none||none|
-
-<h2 id="tocS_OcrParseRequest">OcrParseRequest</h2>
-
-<a id="schemaocrparserequest"></a>
-<a id="schema_OcrParseRequest"></a>
-<a id="tocSocrparserequest"></a>
-<a id="tocsocrparserequest"></a>
-
-```json
-{
-  "ocrRawText": "XX餐厅 消费45元 2025-10-23 18:45",
-  "receiptFileId": 1011
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|ocrRawText|string|true|none||OCR识别的原始文本|
-|receiptFileId|integer|false|none||none|
-
-<h2 id="tocS_FinancialAdviceResponse">FinancialAdviceResponse</h2>
-
-<a id="schemafinancialadviceresponse"></a>
-<a id="schema_FinancialAdviceResponse"></a>
-<a id="tocSfinancialadviceresponse"></a>
-<a id="tocsfinancialadviceresponse"></a>
-
-```json
-{
-  "analysisId": 88,
-  "year": 2025,
-  "month": 10,
-  "content": "本月餐饮支出占比35%，建议控制外卖频率..."
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|analysisId|integer|false|none||none|
-|year|integer|false|none||none|
-|month|integer|false|none||none|
-|content|string|false|none||none|
-
-<h2 id="tocS_ResponseEntityMapObject">ResponseEntityMapObject</h2>
-
-<a id="schemaresponseentitymapobject"></a>
-<a id="schema_ResponseEntityMapObject"></a>
-<a id="tocSresponseentitymapobject"></a>
-<a id="tocsresponseentitymapobject"></a>
-
-```json
-{
-  "key": {}
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|key|object|false|none||none|
-
-<h2 id="tocS_Result">Result</h2>
-
-<a id="schemaresult"></a>
-<a id="schema_Result"></a>
-<a id="tocSresult"></a>
-<a id="tocsresult"></a>
-
-```json
-{
-  "success": true,
-  "code": 0,
-  "message": "string",
-  "data": {}
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|success|boolean|false|none||none|
-|code|integer|false|none||none|
-|message|string|false|none||none|
-|data|object|false|none||none|
-
-<h2 id="tocS_UserLoginDTO">UserLoginDTO</h2>
-
-<a id="schemauserlogindto"></a>
-<a id="schema_UserLoginDTO"></a>
-<a id="tocSuserlogindto"></a>
-<a id="tocsuserlogindto"></a>
-
-```json
-{
-  "username": "string",
-  "password": "string",
-  "email": "string",
-  "phone": "string",
-  "operation": "string"
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|username|string|false|none||none|
-|password|string|false|none||none|
-|email|string|false|none||none|
-|phone|string|false|none||none|
-|operation|string|false|none||"login" 或 "register"|
-
-<h2 id="tocS_User">User</h2>
-
-<a id="schemauser"></a>
-<a id="schema_User"></a>
-<a id="tocSuser"></a>
-<a id="tocsuser"></a>
-
-```json
-{
-  "id": 0,
-  "username": "string",
-  "password": "string",
-  "email": "string",
-  "phone": "string",
-  "avatarPath": "string",
-  "status": 0,
-  "createTime": "string",
-  "updateTime": "string"
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|id|integer(int64)|false|none||用户ID|
-|username|string|false|none||用户名（唯一）|
-|password|string|false|none||密码（BCrypt加密存储）|
-|email|string|false|none||邮箱（唯一）|
-|phone|string|false|none||手机号|
-|avatarPath|string|false|none||头像本地存储路径（相对路径，如"avatars/10001.png"）|
-|status|integer|false|none||状态：0-禁用，1-正常|
-|createTime|string|false|none||创建时间|
-|updateTime|string|false|none||更新时间|
-
-<h2 id="tocS_CategoryBo">CategoryBo</h2>
-
-<a id="schemacategorybo"></a>
-<a id="schema_CategoryBo"></a>
-<a id="tocScategorybo"></a>
-<a id="tocscategorybo"></a>
-
-```json
-{
-  "id": 0,
-  "name": "string",
-  "iconIdentifier": "string",
-  "type": 0,
-  "sortOrder": 0
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|id|integer(int64)|false|none||主分类ID|
-|name|string|false|none||分类名称，唯一|
-|iconIdentifier|string|false|none||图标标识（res:资源名/file:本地路径）|
-|type|integer|false|none||类型：1=支出，2=收入|
-|sortOrder|integer|false|none||排序序号，默认0|
-
-<h2 id="tocS_SubCategoryBo">SubCategoryBo</h2>
-
-<a id="schemasubcategorybo"></a>
-<a id="schema_SubCategoryBo"></a>
-<a id="tocSsubcategorybo"></a>
-<a id="tocssubcategorybo"></a>
-
-```json
-{
-  "id": 0,
-  "categoryId": 0,
-  "name": "string",
-  "iconIdentifier": "string",
-  "sortOrder": 0
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|id|integer(int64)|false|none||子分类ID|
-|categoryId|integer(int64)|false|none||关联主分类ID|
-|name|string|false|none||子分类名称，同一主分类下唯一|
-|iconIdentifier|string|false|none||图标标识，空则继承主分类|
-|sortOrder|integer|false|none||排序序号，默认0|
-
-<h2 id="tocS_BillBo">BillBo</h2>
-
-<a id="schemabillbo"></a>
-<a id="schema_BillBo"></a>
-<a id="tocSbillbo"></a>
-<a id="tocsbillbo"></a>
-
-```json
-{
-  "id": 0,
-  "originalAmount": 0,
-  "refundAmount": 0,
-  "type": 0,
-  "categoryId": 0,
-  "subCategoryId": 0,
-  "merchant": "string",
-  "remark": "string",
-  "billTime": "string",
-  "paymentMethod": "string",
-  "startTime": "string",
-  "endTime": "string"
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|id|integer(int64)|false|none||账单ID|
-|originalAmount|number|false|none||原始金额|
-|refundAmount|number|false|none||退款金额|
-|type|integer|false|none||类型：1-支出，2-收入|
-|categoryId|integer(int64)|false|none||主分类ID（需存在且归属当前用户）|
-|subCategoryId|integer(int64)|false|none||子分类ID，可为null（若传则需归属对应主分类）|
-|merchant|string|false|none||商户名称（最长100字符）|
-|remark|string|false|none||备注（最多500字符）|
-|billTime|string|false|none||账单时间，格式yyyy-MM-dd HH:mm:ss|
-|paymentMethod|string|false|none||支付方式（最长50字符）|
-|startTime|string|false|none||起止时间|
-|endTime|string|false|none||none|
-
-<h2 id="tocS_UserBo">UserBo</h2>
-
-<a id="schemauserbo"></a>
-<a id="schema_UserBo"></a>
-<a id="tocSuserbo"></a>
-<a id="tocsuserbo"></a>
-
-```json
-{
-  "id": 0,
-  "username": "string",
-  "password": "string",
-  "email": "string",
-  "phone": "string",
-  "avatarPath": "string",
-  "status": 0,
-  "createTime": "string",
-  "updateTime": "string"
-}
-
-```
-
-### 属性
-
-|名称|类型|必选|约束|中文名|说明|
-|---|---|---|---|---|---|
-|id|integer(int64)|false|none||用户ID|
-|username|string|false|none||用户名（唯一）|
-|password|string|false|none||密码（BCrypt加密存储）|
-|email|string|false|none||邮箱（唯一）|
-|phone|string|false|none||手机号|
-|avatarPath|string|false|none||头像本地存储路径（相对路径，如"avatars/10001.png"）|
-|status|integer|false|none||状态：0-禁用，1-正常|
-|createTime|string|false|none||创建时间|
-|updateTime|string|false|none||更新时间|
-
-

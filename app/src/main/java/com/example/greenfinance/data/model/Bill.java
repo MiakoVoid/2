@@ -19,6 +19,7 @@ public class Bill {
     private String subCategoryName;
     private String merchant;
     private String remark;
+    private String orderNumber; // 添加订单编号字段
     private Date billTime;
     private String paymentMethod;
     private Date createTime;
@@ -35,5 +36,15 @@ public class Bill {
         this.merchant = merchant;
         this.billTime = billTime;
     }
-
-   }
+    
+    /**
+     * 获取完整的分类名称（主分类 + 子分类）
+     * @return 完整的分类名称
+     */
+    public String getFullCategoryName() {
+        if (subCategoryName != null && !subCategoryName.isEmpty()) {
+            return categoryName + " - " + subCategoryName;
+        }
+        return categoryName;
+    }
+}

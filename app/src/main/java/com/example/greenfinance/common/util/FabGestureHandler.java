@@ -1,22 +1,29 @@
 package com.example.greenfinance.common.util;
 
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
-import com.example.greenfinance.presentation.bill.view.ManualBillingActivity;
-import com.example.greenfinance.presentation.bill.view.ScreenshotBillingActivity;
+import com.example.greenfinance.presentation.MainActivity;
+
+import lombok.Getter;
 
 /**
  * 浮动按钮手势处理器
  * 处理浮动按钮的点击和滑动手势
  */
 public class FabGestureHandler implements View.OnTouchListener {
+    private static final String TAG = "FabGestureHandler";
     private final GestureDetector gestureDetector;
     private final Context context;
+    /**
+     * -- GETTER --
+     *  获取当前附加的视图
+     *
+     */
+    @Getter
     private View attachedView;
 
     public FabGestureHandler(Context context) {
@@ -26,22 +33,46 @@ public class FabGestureHandler implements View.OnTouchListener {
         SwipeGestureDetector.OnSwipeListener swipeListener = new SwipeGestureDetector.OnSwipeListener() {
             @Override
             public void onSwipeLeft() {
-                // 左滑进入截图记账
-                startScreenshotBilling();
+                // 左滑进入截图记账（根据新规范）
+                Log.d(TAG, "Swipe left detected");
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).onFabSwipeLeft();
+                }
             }
 
             @Override
             public void onSwipeRight() {
-                // 右滑进入普通记账
-                startManualBilling();
+                // 右滑进入手动记账（根据新规范）
+                Log.d(TAG, "Swipe right detected");
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).onFabSwipeRight();
+                }
+            }
+            
+            @Override
+            public void onSwipeUp() {
+                // 上滑进入文字记账（根据新规范）
+                Log.d(TAG, "Swipe up detected");
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).onFabSwipeUp();
+                }
+            }
+            
+            @Override
+            public void onSwipeDown() {
+                // 下滑暂不处理
+                Log.d(TAG, "Swipe down detected - no action");
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).onFabSwipeDown();
+                }
             }
 
             @Override
             public void onClick() {
-                // 点击进入文字记账
-                // 通过接口回调处理点击事件
-                if (context instanceof OnFabClickListener) {
-                    ((OnFabClickListener) context).onFabClick();
+                // 点击显示选项菜单
+                Log.d(TAG, "Click detected");
+                if (context instanceof FabGestureHandler.OnFabClickListener) {
+                    ((FabGestureHandler.OnFabClickListener) context).onFabClick();
                 }
             }
         };
@@ -53,6 +84,7 @@ public class FabGestureHandler implements View.OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if (v == null || event == null) {
+            Log.w(TAG, "View or MotionEvent is null");
             return false;
         }
 
@@ -62,59 +94,22 @@ public class FabGestureHandler implements View.OnTouchListener {
         }
 
         // 处理手势事件
-        boolean handled = gestureDetector.onTouchEvent(event);
-
-        // 当检测到ACTION_UP事件时调用performClick以确保可访问性
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            v.performClick();
+        boolean result = gestureDetector.onTouchEvent(event);
+        
+        // 如果是ACTION_UP事件且没有被手势检测器处理，则认为是点击事件
+        if (event.getAction() == MotionEvent.ACTION_UP && !result) {
+            Log.d(TAG, "Click event detected via ACTION_UP");
+            if (context instanceof OnFabClickListener) {
+                ((OnFabClickListener) context).onFabClick();
+                // 修复：在检测到点击时调用performClick以满足无障碍性要求
+                if (v != null) {
+                    v.performClick();
+                }
+                return true;
+            }
         }
 
-        return handled;
-    }
-
-    /**
-     * 获取当前附加的视图
-     * @return 附加的视图
-     */
-    public View getAttachedView() {
-        return attachedView;
-    }
-
-    /**
-     * 手动触发点击事件
-     */
-    public void performClick() {
-        if (attachedView != null) {
-            attachedView.performClick();
-        }
-    }
-
-    /**
-     * 设置附加视图
-     * @param view 要附加的视图
-     */
-    public void setAttachedView(View view) {
-        this.attachedView = view;
-    }
-    
-    /**
-     * 启动截图记账
-     */
-    private void startScreenshotBilling() {
-        if (context != null) {
-            Intent intent = new Intent(context, ScreenshotBillingActivity.class);
-            context.startActivity(intent);
-        }
-    }
-    
-    /**
-     * 启动手动记账
-     */
-    private void startManualBilling() {
-        if (context != null) {
-            Intent intent = new Intent(context, ManualBillingActivity.class);
-            context.startActivity(intent);
-        }
+        return result;
     }
     
     /**

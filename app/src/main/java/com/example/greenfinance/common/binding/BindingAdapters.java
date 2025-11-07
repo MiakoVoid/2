@@ -13,6 +13,8 @@ public class BindingAdapters {
 
     @BindingAdapter("indicatorColor")
     public static void setIndicatorColor(LinearProgressIndicator progressBar, int color) {
-        progressBar.setIndicatorColor(color);
+        if (color != 0) {
+            progressBar.setIndicatorColor(color);
+        }
     }
 }

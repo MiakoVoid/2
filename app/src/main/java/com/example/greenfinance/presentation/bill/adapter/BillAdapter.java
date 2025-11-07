@@ -1,4 +1,4 @@
-package com.example.greenfinance.presentation.home.adapter;
+package com.example.greenfinance.presentation.bill.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,7 +81,7 @@ public class BillAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     // Header ViewHolder
-    static class HeaderViewHolder extends RecyclerView.ViewHolder {
+    public static class HeaderViewHolder extends RecyclerView.ViewHolder {
         private TextView tvHeaderDate;
 
         public HeaderViewHolder(@NonNull View itemView) {
@@ -95,7 +95,7 @@ public class BillAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     // Bill Item ViewHolder
-    static class BillViewHolder extends RecyclerView.ViewHolder {
+    public static class BillViewHolder extends RecyclerView.ViewHolder {
         private TextView tvMerchant;
         private TextView tvAmount;
         private TextView tvCategory;
