@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 财务概览卡片尺寸 -->
+    <dimen name="financial_card_height">220dp</dimen>
+    <dimen name="financial_item_height">90dp</dimen>
+    <dimen name="financial_card_padding">20dp</dimen>
+    
+    <!-- 预算进度条尺寸 -->
+    <dimen name="budget_progress_height">12dp</dimen>
+    <dimen name="budget_card_padding">12dp</dimen>
+    
+    <!-- 字体大小 -->
+    <dimen name="financial_title_text">16sp</dimen>
+    <dimen name="financial_amount_text">14sp</dimen>
+    <dimen name="budget_title_text">16sp</dimen>
+    <dimen name="budget_usage_text">14sp</dimen>
+</resources>

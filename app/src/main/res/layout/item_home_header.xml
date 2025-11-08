@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- 财务概览卡片：统一卡片样式 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/financial_overview_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/background_color"
+        app:strokeWidth="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <!-- 今日支出卡片：美化字体样式 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/financial_item_height"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_financial_card"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/financial_card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="今日支出"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/financial_title_text" />
+
+                    <TextView
+                        android:id="@+id/tv_today_expense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="¥0.00"
+                        android:textColor="@color/expense_color"
+                        android:textSize="@dimen/financial_amount_text"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- 本月支出卡片：美化字体样式 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/financial_item_height"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_financial_card"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/financial_card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="本月支出"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/financial_title_text" />
+
+                    <TextView
+                        android:id="@+id/tv_month_expense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="¥0.00"
+                        android:textColor="@color/expense_color"
+                        android:textSize="@dimen/financial_amount_text"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- 本月收入卡片：美化字体样式 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/financial_item_height"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_financial_card"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/financial_card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="本月收入"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/financial_title_text" />
+
+                    <TextView
+                        android:id="@+id/tv_month_income"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:text="¥0.00"
+                        android:textColor="@color/income_color"
+                        android:textSize="@dimen/financial_amount_text"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardBackgroundColor="@color/surface_color"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/surface_color"
+                    android:orientation="vertical"
+                    android:padding="@dimen/budget_card_padding">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="预算情况"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/budget_title_text"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_manage_budget"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="8dp"
+                            android:text="管理"
+                            android:textColor="@color/link_color"
+                            android:textSize="@dimen/budget_usage_text"
+                            app:rippleColor="@color/link_color" />
+                    </LinearLayout>
+
+                    <!-- 预算进度条：保持原样式 -->
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/budget_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/budget_progress_height"
+                        android:progress="0"
+                        app:indicatorColor="@color/budget_sufficient"
+                        app:trackColor="@color/border_color"
+                        app:trackCornerRadius="6dp"
+                        app:trackThickness="@dimen/budget_progress_height" />
+
+                    <!-- 预算使用率：美化字体样式 -->
+                    <TextView
+                        android:id="@+id/tv_budget_usage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif"
+                        android:maxLines="1"
+                        android:text="预算: ¥0.00/¥0.00"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/budget_usage_text" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>
